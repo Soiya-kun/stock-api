@@ -1,0 +1,20 @@
+version: '3.9'
+services:
+  template-backend-test:
+    container_name: template-backend-test
+
+    # Docker起動時、network 〇〇 not foundのエラーが出た場合、
+    # docker network lsコマンドの実行で出てくる既存のdocker_networkの名前を
+    # 以下のようnetwork_modeに設定する
+    # network_mode: docker_default
+
+    build:
+      context: .
+    volumes:
+      - .:/app
+    ports:
+      - 81:81
+    env_file: env.test
+    tty: true
+    command: >
+      ash -c "go run main.go"

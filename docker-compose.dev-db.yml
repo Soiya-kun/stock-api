@@ -1,0 +1,26 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0.28
+    container_name: template-mysql
+
+    # Docker起動時、network 〇〇 not foundのエラーが出た場合、
+    # docker network lsコマンドの実行で出てくる既存のdocker_networkの名前を
+    # 以下のようnetwork_modeに設定する
+    # network_mode: docker_default
+
+    # M1チップでは以下の platform: linux/x86_64 をコメントインする
+    platform: linux/x86_64
+
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=template
+      - MYSQL_USER=template
+      - MYSQL_PASSWORD=password
+      - TZ=Asia/Tokyo
+    volumes:
+      - ./mysql/mysql-data:/var/lib/mysql
+      - ./mysql:/etc/mysql/conf.d
+
