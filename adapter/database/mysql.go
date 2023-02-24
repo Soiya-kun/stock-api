@@ -51,5 +51,8 @@ func Migrate(db *gorm.DB) error {
 	if err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&entity.User{}); err != nil {
 		return err
 	}
+	if err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&entity.Stock{}); err != nil {
+		return err
+	}
 	return nil
 }
