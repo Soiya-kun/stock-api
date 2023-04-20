@@ -12,4 +12,5 @@ var (
 
 type StockRepository interface {
 	Create([]entity.Stock) error
+	FindByStockCode(string) ([]entity.Stock, error)
 }

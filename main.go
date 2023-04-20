@@ -51,8 +51,12 @@ func main() {
 	userAuth := authentication.NewUserAuth()
 	userUC := interactor.NewUserUseCase(mailDriver, ulidDriver, userAuth, userRepo)
 
+	stockRepo := repository.NewStockRepository(db)
+	stockUC := interactor.NewStockUseCase(stockRepo)
+
 	s := router.NewServer(
 		userUC,
+		stockUC,
 	)
 
 	if err := s.Start(":80"); err != nil {

@@ -15,6 +15,7 @@ import (
 
 func NewServer(
 	userUC interactor.IUserUseCase,
+	stockUC interactor.IStockUseCase,
 ) *echo.Echo {
 	e := echo.New()
 
@@ -29,6 +30,7 @@ func NewServer(
 
 	authHandler := handler.NewAuthHandler(userUC)
 	userHandler := handler.NewUserHandler(userUC)
+	stockHandler := handler.NewStockHandler(stockUC)
 	postCodeJPProxyHandler := proxy.NewPostCodeJPProxyHandler()
 
 	e.GET("/health", func(c echo.Context) error {
@@ -60,6 +62,10 @@ func NewServer(
 	user.GET("/:user-id", userHandler.FindById)
 	user.PATCH("/:user-id", userHandler.Update)
 	user.DELETE("/:user-id", userHandler.Delete)
+
+	// stock
+	stockAuth := auth.Group("/stocks")
+	stockAuth.GET("/:sc", stockHandler.FindBySC)
 
 	// post code jp proxy
 	postCodeJP := auth.Group("/address")

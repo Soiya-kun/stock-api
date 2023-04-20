@@ -25,3 +25,12 @@ func (r *StockRepository) Create(stocks []entity.Stock) error {
 	}
 	return nil
 }
+
+func (r *StockRepository) FindByStockCode(s string) ([]entity.Stock, error) {
+	var stocks []entity.Stock
+	err := r.db.Where("stock_code = ?", s).Find(&stocks).Error
+	if err != nil {
+		return nil, err
+	}
+	return stocks, nil
+}

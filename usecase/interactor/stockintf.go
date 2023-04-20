@@ -28,4 +28,5 @@ type StockCreate struct {
 
 type IStockUseCase interface {
 	CreateStocks([]StockCreate) ([]entity.Stock, error)
+	FindByStockCode(string) ([]entity.Stock, error)
 }
