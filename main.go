@@ -43,6 +43,12 @@ func main() {
 		}
 	}()
 
+	err = database.Migrate(db)
+	if err != nil {
+		logger.Error("Failed to migrate", zap.Error(err))
+		return
+	}
+
 	awsCli := aws.NewCli()
 	mailDriver := email.NewEmailDriver(awsCli)
 	ulidDriver := ulid.NewULID()

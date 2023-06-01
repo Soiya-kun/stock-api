@@ -12,6 +12,7 @@ services:
       context: .
     volumes:
       - .:/app
+      - C:\Users\djmaa\OneDrive\StockAnalysis\StockValueCSVByKabuplus:/app/stocks
     ports:
       - 80:80
     env_file: env.dev

@@ -1,8 +1,16 @@
 package port
 
+import (
+	"encoding/csv"
+	"os"
+)
+
+type StockCSV struct {
+	File   *os.File
+	Reader *csv.Reader
+}
+
 type FileDriver interface {
-	CopyFile(srcId, dstId string) error
-	CreatePreSignedURLForGet(filepath string) (string, error)
-	CreatePreSignedURLForPut(filepath string) (string, error)
-	DeleteFileWithPath(filepath string) error
+	GetCSVPath() ([]string, error)
+	GetCSVFileReader(path string) (StockCSV, error)
 }
