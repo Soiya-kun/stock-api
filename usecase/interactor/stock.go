@@ -46,3 +46,12 @@ func (s StockUseCase) CreateStocks(creates []StockCreate) ([]entity.Stock, error
 func (s StockUseCase) FindByStockCode(sc string) ([]entity.Stock, error) {
 	return s.stockRepo.FindByStockCode(sc)
 }
+
+func (s StockUseCase) FindByRandom() ([]entity.Stock, error) {
+	sc, err := s.stockRepo.FindRandomSC()
+	if err != nil {
+		return nil, err
+	}
+
+	return s.stockRepo.FindByStockCode(sc)
+}

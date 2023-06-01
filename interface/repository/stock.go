@@ -28,7 +28,7 @@ func (r *StockRepository) Create(stocks []entity.Stock) error {
 			err := tx.Create(&stock).Error
 			if err != nil {
 				fmt.Println("failed to create stocks: %w", err)
-				return port.ErrCreateStock
+				continue
 			}
 		}
 		return nil
@@ -98,4 +98,13 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) ([]entity.Stock, error) {
 	}
 
 	return stocks, nil
+}
+
+func (r *StockRepository) FindRandomSC() (string, error) {
+	var stock entity.Stock
+	err := r.db.Raw("SELECT * FROM stocks ORDER BY RAND() LIMIT 1").Scan(&stock).Error
+	if err != nil {
+		return "", err
+	}
+	return stock.StockCode, nil
 }

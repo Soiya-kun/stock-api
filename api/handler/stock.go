@@ -55,3 +55,15 @@ func (h *StockHandler) FindBySC(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, schema.StocksResFromEntity(res))
 }
+
+func (h *StockHandler) FindByRandom(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	res, err := h.StockUseCase.FindByRandom()
+	if err != nil {
+		logger.Error("Failed to find stock", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, schema.StocksResFromEntity(res))
+}

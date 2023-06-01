@@ -1,12 +1,14 @@
 package main
 
 import (
+	"os"
+
+	"go.uber.org/zap"
+
 	"gitlab.com/soy-app/stock-api/adapter/database"
 	"gitlab.com/soy-app/stock-api/adapter/file"
 	"gitlab.com/soy-app/stock-api/interface/repository"
 	"gitlab.com/soy-app/stock-api/log"
-	"go.uber.org/zap"
-	"os"
 )
 
 // コマンドライン引数にstockデータのcsvファイルを格納したパスを取る
@@ -26,7 +28,7 @@ func main() {
 		return
 	}
 
-	for i, path := range csvFilePath {
+	for _, path := range csvFilePath {
 		stockCSV, err := fileDriver.GetCSVFileReader(path)
 		if err != nil {
 			logger.Error("Failed to get csv file reader", zap.Error(err))
@@ -50,9 +52,6 @@ func main() {
 		if err != nil {
 			logger.Error("Failed to create stocks", zap.Error(err))
 			return
-		}
-		if i == 3 {
-			break
 		}
 	}
 }

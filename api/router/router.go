@@ -64,7 +64,9 @@ func NewServer(
 	user.DELETE("/:user-id", userHandler.Delete)
 
 	// stock
+	stockApi := api.Group("/stocks")
 	stockAuth := auth.Group("/stocks")
+	stockApi.GET("/random", stockHandler.FindByRandom)
 	stockAuth.GET("/:sc", stockHandler.FindBySC)
 
 	// post code jp proxy

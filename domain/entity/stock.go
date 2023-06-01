@@ -3,12 +3,11 @@ package entity
 import "time"
 
 type Stock struct {
-	ID            uint      `gorm:"primaryKey;autoIncrement"`
-	StockCode     string    `gorm:"size:30;not null"`  // "SC"
-	StockName     string    `gorm:"size:255;not null"` // "名称"
-	Market        string    `gorm:"size:255;not null"` // "市場"
-	Industry      string    `gorm:"size:255;not null"` // "業種"
-	Date          time.Time `gorm:"size:255;not null"` // "日付"
+	StockCode     string    `gorm:"primaryKey;size:30;not null"` // "SC"
+	StockName     string    `gorm:"size:255;not null"`           // "名称"
+	Market        string    `gorm:"size:255;not null"`           // "市場"
+	Industry      string    `gorm:"size:255;not null"`           // "業種"
+	Date          time.Time `gorm:"primaryKey;not null"`         // "日付"
 	Price         *float64  // "株価"
 	Change        *float64  // "前日比"
 	ChangePercent *float64  // "前日比（％）"

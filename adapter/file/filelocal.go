@@ -3,11 +3,13 @@ package file
 import (
 	"bufio"
 	"encoding/csv"
-	"gitlab.com/soy-app/stock-api/usecase/port"
-	"golang.org/x/text/encoding/japanese"
-	"golang.org/x/text/transform"
 	"os"
 	"path/filepath"
+
+	"golang.org/x/text/encoding/japanese"
+	"golang.org/x/text/transform"
+
+	"gitlab.com/soy-app/stock-api/usecase/port"
 )
 
 type FileLocal struct{}
