@@ -13,8 +13,8 @@ type LoginResUser struct {
 }
 
 type LoginRes struct {
-	AccessToken string       `json:"access_token"`
-	TokenType   string       `json:"token_type"`
+	AccessToken string       `json:"accessToken"`
+	TokenType   string       `json:"tokenType"`
 	User        LoginResUser `json:"user"`
 }
 

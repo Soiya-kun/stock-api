@@ -11,4 +11,6 @@ type StockRepository interface {
 	ReadCSV(reader *csv.Reader) ([]entity.Stock, error)
 	FindByStockCode(string) ([]entity.Stock, error)
 	FindRandomSC() (string, error)
+	SaveStockCode(sc, userID string) error
+	ListSC() ([]string, error)
 }

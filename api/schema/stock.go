@@ -107,15 +107,15 @@ func StockResFromEntity(stock entity.Stock) StockRes {
 		Market:               stock.Market,
 		Industry:             stock.Industry,
 		Date:                 stock.Date.Format("2006-01-02"),
-		ClosedPrice:          *stock.Price,
-		OpenedPrice:          *stock.OpenedPrice,
-		HighPrice:            *stock.High,
-		LowPrice:             *stock.Low,
-		Volume:               *stock.Volume,
-		TransactionPrice:     *stock.TradingValue,
-		MarketCapitalization: *stock.MarketCap,
-		LowLimit:             *stock.LowerLimit,
-		HighLimit:            *stock.UpperLimit,
+		ClosedPrice:          stock.PriceVal(),
+		OpenedPrice:          stock.OpenedPriceVal(),
+		HighPrice:            stock.HighVal(),
+		LowPrice:             stock.LowVal(),
+		Volume:               stock.VolumeVal(),
+		TransactionPrice:     stock.TradingValueVal(),
+		MarketCapitalization: stock.MarketCapVal(),
+		LowLimit:             stock.LowerLimitVal(),
+		HighLimit:            stock.UpperLimitVal(),
 	}
 }
 
@@ -125,4 +125,12 @@ func StocksResFromEntity(stocks []entity.Stock) []StockRes {
 		ret[i] = StockResFromEntity(v)
 	}
 	return ret
+}
+
+type SaveSCReq struct {
+	StockCode string `json:"stockCode"`
+}
+
+type StockCodeListRes struct {
+	StockCodes []string `json:"stockCodes"`
 }

@@ -60,8 +60,6 @@ func (r *UserRepository) FindByEmail(email string) (entity.User, error) {
 func (r *UserRepository) FindByID(userID string) (entity.User, error) {
 	res := entity.User{}
 	err := r.db.
-		Preload("UserDetail").
-		Preload("UserDetail").
 		Where("is_deleted = false").
 		Where("user_id = ?", userID).
 		First(&res).
@@ -79,8 +77,6 @@ func (r *UserRepository) Search(query string, userType string, skip int, limit i
 	var res []entity.User
 	var total int64
 	sqlQuery := r.db.Model(&entity.User{}).
-		Preload("UserDetail").
-		Joins("LEFT OUTER JOIN user_details ON user_details.user_id = users.user_id").
 		Where("email LIKE ?", "%"+query+"%").
 		Where("is_deleted = false")
 

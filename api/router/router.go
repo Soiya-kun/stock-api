@@ -65,9 +65,12 @@ func NewServer(
 
 	// stock
 	stockApi := api.Group("/stocks")
-	stockAuth := auth.Group("/stocks")
 	stockApi.GET("/random", stockHandler.FindByRandom)
+	stockApi.GET("/stock-codes", stockHandler.ListSC)
+
+	stockAuth := auth.Group("/stocks")
 	stockAuth.GET("/:sc", stockHandler.FindBySC)
+	stockAuth.POST("/stock-codes", stockHandler.SaveSC)
 
 	// post code jp proxy
 	postCodeJP := auth.Group("/address")

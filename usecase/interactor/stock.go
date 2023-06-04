@@ -55,3 +55,11 @@ func (s StockUseCase) FindByRandom() ([]entity.Stock, error) {
 
 	return s.stockRepo.FindByStockCode(sc)
 }
+
+func (s StockUseCase) SaveStockCode(sc string, user entity.User) error {
+	return s.stockRepo.SaveStockCode(sc, user.UserID)
+}
+
+func (s StockUseCase) ListSC() ([]string, error) {
+	return s.stockRepo.ListSC()
+}

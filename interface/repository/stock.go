@@ -108,3 +108,19 @@ func (r *StockRepository) FindRandomSC() (string, error) {
 	}
 	return stock.StockCode, nil
 }
+
+func (r *StockRepository) SaveStockCode(sc, userId string) error {
+	return r.db.Create(&entity.SavedStockCode{StockCode: sc, UserID: userId}).Error
+}
+
+func (r *StockRepository) ListSC() ([]string, error) {
+	var scs []string
+	err := r.db.Model(&entity.Stock{}).
+		Group("stock_code").
+		Pluck("stock_code", &scs).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return scs, nil
+}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"gitlab.com/soy-app/stock-api/api/middleware"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -66,4 +67,43 @@ func (h *StockHandler) FindByRandom(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, schema.StocksResFromEntity(res))
+}
+
+func (h *StockHandler) SaveSC(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	req := &schema.SaveSCReq{}
+	if err := c.Bind(req); err != nil {
+		logger.Error("Failed to bind request", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	user, err := middleware.GetUserFromContext(ctx)
+	if err != nil {
+		logger.Error("Failed to get user from context", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	err = h.StockUseCase.SaveStockCode(req.StockCode, user)
+	if err != nil {
+		logger.Error("Failed to save stock", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, nil)
+}
+
+func (h *StockHandler) ListSC(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	ret, err := h.StockUseCase.ListSC()
+	if err != nil {
+		logger.Error("Failed to delete stock", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, schema.StockCodeListRes{
+		StockCodes: ret,
+	})
 }

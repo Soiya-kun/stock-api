@@ -23,3 +23,87 @@ type Stock struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
+
+func (s *Stock) PriceVal() float64 {
+	if s.Price == nil {
+		return 0
+	}
+	return *s.Price
+}
+
+func (s *Stock) ChangeVal() float64 {
+	if s.Change == nil {
+		return 0
+	}
+	return *s.Change
+}
+
+func (s *Stock) ChangePercentVal() float64 {
+	if s.ChangePercent == nil {
+		return 0
+	}
+	return *s.ChangePercent
+}
+
+func (s *Stock) PreviousCloseVal() float64 {
+	if s.PreviousClose == nil {
+		return 0
+	}
+	return *s.PreviousClose
+}
+
+func (s *Stock) OpenedPriceVal() float64 {
+	if s.OpenedPrice == nil {
+		return 0
+	}
+	return *s.OpenedPrice
+}
+
+func (s *Stock) HighVal() float64 {
+	if s.High == nil {
+		return 0
+	}
+	return *s.High
+}
+
+func (s *Stock) LowVal() float64 {
+	if s.Low == nil {
+		return 0
+	}
+	return *s.Low
+}
+
+func (s *Stock) VolumeVal() float64 {
+	if s.Volume == nil {
+		return 0
+	}
+	return *s.Volume
+}
+
+func (s *Stock) TradingValueVal() float64 {
+	if s.TradingValue == nil {
+		return 0
+	}
+	return *s.TradingValue
+}
+
+func (s *Stock) MarketCapVal() float64 {
+	if s.MarketCap == nil {
+		return 0
+	}
+	return *s.MarketCap
+}
+
+func (s *Stock) LowerLimitVal() float64 {
+	if s.LowerLimit == nil {
+		return 0
+	}
+	return *s.LowerLimit
+}
+
+func (s *Stock) UpperLimitVal() float64 {
+	if s.UpperLimit == nil {
+		return 0
+	}
+	return *s.UpperLimit
+}

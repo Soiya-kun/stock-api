@@ -3,9 +3,9 @@ package schema
 import "gitlab.com/soy-app/stock-api/domain/entity"
 
 type UserRes struct {
-	UserId   string `json:"user_id"`
+	UserId   string `json:"userId"`
 	Email    string `json:"email"`
-	UserType string `json:"user_type"`
+	UserType string `json:"userType"`
 }
 
 type UsersRes struct {
@@ -17,21 +17,21 @@ type CreateUserReq struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
-	UserType string `json:"user_type"`
+	UserType string `json:"userType"`
 }
 
 type CreateUserReqByAdmin struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
-	UserType string `json:"user_type"`
+	UserType string `json:"userType"`
 }
 
 type UpdateUserReq struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	UserID   string `param:"user-id"`
-	UserType string `json:"user_type"`
+	UserType string `json:"userType"`
 }
 
 type UserSearchQueryReq struct {
