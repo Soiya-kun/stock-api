@@ -69,6 +69,7 @@ func NewServer(
 	stockApi.GET("/stock-codes", stockHandler.ListSC)
 
 	stockAuth := auth.Group("/stocks")
+	stockAuth.POST("", stockHandler.Create)
 	stockAuth.GET("/:sc", stockHandler.FindBySC)
 	stockAuth.POST("/stock-codes", stockHandler.SaveSC)
 
