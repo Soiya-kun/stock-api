@@ -100,7 +100,7 @@ type StockRes struct {
 	HighLimit            float64 `json:"highLimit"`
 }
 
-func StockResFromEntity(stock entity.Stock) StockRes {
+func StockResFromEntity(stock *entity.Stock) StockRes {
 	return StockRes{
 		StockCode:            stock.StockCode,
 		StockName:            stock.StockName,
@@ -119,7 +119,7 @@ func StockResFromEntity(stock entity.Stock) StockRes {
 	}
 }
 
-func StocksResFromEntity(stocks []entity.Stock) []StockRes {
+func StocksResFromEntity(stocks []*entity.Stock) []StockRes {
 	ret := make([]StockRes, len(stocks))
 	for i, v := range stocks {
 		ret[i] = StockResFromEntity(v)
@@ -133,4 +133,10 @@ type SaveSCReq struct {
 
 type StockCodeListRes struct {
 	StockCodes []string `json:"stockCodes"`
+}
+
+type StockSplitReq struct {
+	StockCode  string    `json:"stockCode"`
+	Date       time.Time `json:"date"`
+	SplitRatio float64   `json:"splitRatio"`
 }

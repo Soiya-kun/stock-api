@@ -57,5 +57,8 @@ func Migrate(db *gorm.DB) error {
 	if err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&entity.SavedStockCode{}); err != nil {
 		return err
 	}
+	if err := db.Set("gorm:table_options", "ENGINE=InnoDB").AutoMigrate(&entity.StockSplit{}); err != nil {
+		return err
+	}
 	return nil
 }

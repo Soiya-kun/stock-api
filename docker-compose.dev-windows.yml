@@ -2,7 +2,7 @@ version: '3.9'
 services:
   mysql:
     image: mysql:8.0.28
-    container_name: template-mysql
+    container_name: stock-mysql
 
     # Docker起動時、network 〇〇 not foundのエラーが出た場合、
     # docker network lsコマンドの実行で出てくる既存のdocker_networkの名前を
@@ -24,8 +24,8 @@ services:
       - ./mysql/mysql-data:/var/lib/mysql
       - ./mysql:/etc/mysql/conf.d
 
-  template-backend:
-    container_name: template-backend
+  stock-backend:
+    container_name: stock-backend
 
     # Docker起動時、network 〇〇 not foundのエラーが出た場合、
     # docker network lsコマンドの実行で出てくる既存のdocker_networkの名前を

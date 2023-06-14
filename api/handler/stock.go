@@ -1,11 +1,10 @@
 package handler
 
 import (
-	"gitlab.com/soy-app/stock-api/api/middleware"
-	"net/http"
-
 	"github.com/labstack/echo/v4"
+	"gitlab.com/soy-app/stock-api/api/middleware"
 	"go.uber.org/zap"
+	"net/http"
 
 	"gitlab.com/soy-app/stock-api/api/schema"
 	"gitlab.com/soy-app/stock-api/log"
@@ -106,4 +105,26 @@ func (h *StockHandler) ListSC(c echo.Context) error {
 	return c.JSON(http.StatusOK, schema.StockCodeListRes{
 		StockCodes: ret,
 	})
+}
+
+func (h *StockHandler) CreateSplit(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	req := &schema.StockSplitReq{}
+	if err := c.Bind(req); err != nil {
+		logger.Error("Failed to bind request", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	err := h.StockUseCase.CreateStockSplit(interactor.StockSplitCreate{
+		StockCode:  req.StockCode,
+		Date:       req.Date,
+		SplitRatio: req.SplitRatio,
+	})
+	if err != nil {
+		logger.Error("Failed to create stock split", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, nil)
 }

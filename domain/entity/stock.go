@@ -107,3 +107,30 @@ func (s *Stock) UpperLimitVal() float64 {
 	}
 	return *s.UpperLimit
 }
+
+func (s *Stock) StockAfterApplyingSplit(split StockSplit) {
+	if s.Date.After(split.Date) {
+		return
+	}
+	if s.OpenedPrice != nil {
+		*s.OpenedPrice /= split.SplitRatio
+	}
+	if s.High != nil {
+		*s.High /= split.SplitRatio
+	}
+	if s.Low != nil {
+		*s.Low /= split.SplitRatio
+	}
+	if s.Price != nil {
+		*s.Price /= split.SplitRatio
+	}
+	if s.PreviousClose != nil {
+		*s.PreviousClose /= split.SplitRatio
+	}
+	if s.LowerLimit != nil {
+		*s.LowerLimit /= split.SplitRatio
+	}
+	if s.UpperLimit != nil {
+		*s.UpperLimit /= split.SplitRatio
+	}
+}

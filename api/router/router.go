@@ -70,6 +70,7 @@ func NewServer(
 
 	stockAuth := auth.Group("/stocks")
 	stockAuth.POST("", stockHandler.Create)
+	stockAuth.POST("/stock-splits", stockHandler.CreateSplit)
 	stockAuth.GET("/:sc", stockHandler.FindBySC)
 	stockAuth.POST("/stock-codes", stockHandler.SaveSC)
 

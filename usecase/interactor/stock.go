@@ -43,11 +43,28 @@ func (s StockUseCase) CreateStocks(creates []StockCreate) ([]entity.Stock, error
 	return stocks, nil
 }
 
-func (s StockUseCase) FindByStockCode(sc string) ([]entity.Stock, error) {
-	return s.stockRepo.FindByStockCode(sc)
+func (s StockUseCase) FindByStockCode(sc string) ([]*entity.Stock, error) {
+	res, err := s.stockRepo.FindByStockCode(sc)
+	if err != nil {
+		return nil, err
+	}
+
+	splits, err := s.stockRepo.FindStockSplitsByStockCode(sc)
+	if err != nil {
+		return nil, err
+	}
+	if len(splits) == 0 {
+		return res, nil
+	}
+
+	stocks := entity.StockList{
+		Stocks:      res,
+		StockSplits: splits,
+	}
+	return stocks.GetStocksAfterApplyingSplit(), nil
 }
 
-func (s StockUseCase) FindByRandom() ([]entity.Stock, error) {
+func (s StockUseCase) FindByRandom() ([]*entity.Stock, error) {
 	sc, err := s.stockRepo.FindRandomSC()
 	if err != nil {
 		return nil, err
@@ -62,4 +79,13 @@ func (s StockUseCase) SaveStockCode(sc string, user entity.User) error {
 
 func (s StockUseCase) ListSC() ([]string, error) {
 	return s.stockRepo.ListSC()
+}
+
+func (s StockUseCase) CreateStockSplit(create StockSplitCreate) error {
+	return s.stockRepo.CreateStockSplit(
+		entity.StockSplit{
+			StockCode:  create.StockCode,
+			Date:       create.Date,
+			SplitRatio: create.SplitRatio,
+		})
 }

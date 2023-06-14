@@ -35,8 +35,8 @@ func (r *StockRepository) Create(stocks []entity.Stock) error {
 	})
 }
 
-func (r *StockRepository) FindByStockCode(s string) ([]entity.Stock, error) {
-	var stocks []entity.Stock
+func (r *StockRepository) FindByStockCode(s string) ([]*entity.Stock, error) {
+	var stocks []*entity.Stock
 	err := r.db.Where("stock_code = ?", s).Find(&stocks).Error
 	if err != nil {
 		return nil, err
@@ -123,4 +123,17 @@ func (r *StockRepository) ListSC() ([]string, error) {
 		return nil, err
 	}
 	return scs, nil
+}
+
+func (r *StockRepository) CreateStockSplit(s entity.StockSplit) error {
+	return r.db.Create(&s).Error
+}
+
+func (r *StockRepository) FindStockSplitsByStockCode(s string) ([]entity.StockSplit, error) {
+	var splits []entity.StockSplit
+	err := r.db.Where("stock_code = ?", s).Find(&splits).Error
+	if err != nil {
+		return nil, err
+	}
+	return splits, nil
 }

@@ -26,10 +26,17 @@ type StockCreate struct {
 	UpperLimit    *float64
 }
 
+type StockSplitCreate struct {
+	StockCode  string
+	Date       time.Time
+	SplitRatio float64
+}
+
 type IStockUseCase interface {
 	CreateStocks([]StockCreate) ([]entity.Stock, error)
-	FindByStockCode(string) ([]entity.Stock, error)
-	FindByRandom() ([]entity.Stock, error)
+	FindByStockCode(string) ([]*entity.Stock, error)
+	FindByRandom() ([]*entity.Stock, error)
 	SaveStockCode(sc string, u entity.User) error
 	ListSC() ([]string, error)
+	CreateStockSplit(StockSplitCreate) error
 }
