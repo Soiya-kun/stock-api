@@ -13,7 +13,7 @@ import (
 
 // コマンドライン引数にstockデータのcsvファイルを格納したパスを取る
 func main() {
-	logger, err := log.NewLogger()
+	logger, _ := log.NewLogger()
 
 	db, err := database.NewDB(logger)
 	if err != nil {

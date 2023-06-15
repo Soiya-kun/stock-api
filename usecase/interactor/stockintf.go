@@ -33,9 +33,9 @@ type StockSplitCreate struct {
 }
 
 type IStockUseCase interface {
-	CreateStocks([]StockCreate) ([]entity.Stock, error)
-	FindByStockCode(string) ([]*entity.Stock, error)
-	FindByRandom() ([]*entity.Stock, error)
+	CreateStocks([]StockCreate) (entity.StockList, error)
+	FindByStockCode(string) (entity.StockList, error)
+	FindByRandom() (entity.StockList, error)
 	SaveStockCode(sc string, u entity.User) error
 	ListSC() ([]string, error)
 	CreateStockSplit(StockSplitCreate) error

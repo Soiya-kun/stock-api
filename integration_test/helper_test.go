@@ -83,15 +83,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-resty/resty/v2"
-	"github.com/golang/mock/gomock"
+	"gitlab.com/soy-app/stock-api/usecase/port"
 
-	"gitlab.com/soy-app/stock-api/api/schema"
-	mock_port "gitlab.com/soy-app/stock-api/usecase/port_mock"
+	"github.com/go-resty/resty/v2"
 
 	"gitlab.com/soy-app/stock-api/adapter/authentication"
 	"gitlab.com/soy-app/stock-api/adapter/database"
-	"gitlab.com/soy-app/stock-api/adapter/ulid"
 	"gitlab.com/soy-app/stock-api/api/router"
 	"gitlab.com/soy-app/stock-api/config"
 	"gitlab.com/soy-app/stock-api/interface/repository"
@@ -160,22 +157,24 @@ func init() {
 	}
 }
 
-func NewTestServer(t *testing.T, tx *gorm.DB, ctrl *gomock.Controller) (s *httptest.Server, restyClient *resty.Client) {
+func NewTestServer(
+	t *testing.T,
+	tx *gorm.DB,
+	f func() (port.ULID, port.Email),
+) (s *httptest.Server, restyClient *resty.Client) {
 	t.Helper()
 
-	ulidDriver := ulid.NewULID()
-	email := mock_port.NewMockEmail(ctrl)
+	ulidDriver, email := f()
 	userRepo := repository.NewUserRepository(tx, ulidDriver)
 	userAuth := authentication.NewUserAuth()
-	userUC := interactor.NewUserUseCase(
-		email,
-		ulidDriver,
-		userAuth,
-		userRepo,
-	)
+	userUC := interactor.NewUserUseCase(email, ulidDriver, userAuth, userRepo)
+
+	stockRepo := repository.NewStockRepository(tx)
+	stockUC := interactor.NewStockUseCase(stockRepo)
 
 	e := router.NewServer(
 		userUC,
+		stockUC,
 	)
 
 	s = httptest.NewServer(e.Server.Handler)
@@ -187,30 +186,5 @@ func NewTestServer(t *testing.T, tx *gorm.DB, ctrl *gomock.Controller) (s *httpt
 
 	// HTTPクライアント
 	restyClient = resty.New()
-	return
-}
-
-func Login(
-	t *testing.T,
-	email, password string,
-	restyClient *resty.Client,
-	s *httptest.Server,
-) (token string) {
-	t.Helper()
-
-	// トークンの取得
-	loginRes := &schema.LoginRes{}
-	resp, err := restyClient.R().
-		SetHeader("Content-Type", "application/json").
-		SetBody(`{"email": "` + email + `", "password": "` + password + `"}`).
-		SetResult(loginRes).
-		Post(s.URL + "/api/auth/access-token")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if resp.StatusCode() != 200 {
-		t.Errorf("Status Code %d, want = %d", resp.StatusCode(), 200)
-	}
-	token = loginRes.AccessToken
 	return
 }

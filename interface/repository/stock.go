@@ -22,10 +22,11 @@ func NewStockRepository(db *gorm.DB) port.StockRepository {
 	return &StockRepository{db: db}
 }
 
-func (r *StockRepository) Create(stocks []entity.Stock) error {
+func (r *StockRepository) Create(stocks entity.StockList) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
-		for _, stock := range stocks {
-			err := tx.Create(&stock).Error
+		for _, stock := range stocks.Stocks() {
+			s := stock.Stock()
+			err := tx.Create(s).Error
 			if err != nil {
 				fmt.Println("failed to create stocks: %w", err)
 				continue
@@ -35,13 +36,16 @@ func (r *StockRepository) Create(stocks []entity.Stock) error {
 	})
 }
 
-func (r *StockRepository) FindByStockCode(s string) ([]*entity.Stock, error) {
+func (r *StockRepository) FindByStockCode(s string) (entity.StockList, error) {
 	var stocks []*entity.Stock
 	err := r.db.Where("stock_code = ?", s).Find(&stocks).Error
 	if err != nil {
-		return nil, err
+		return entity.StockList{}, err
 	}
-	return stocks, nil
+
+	return entity.StockList{
+		StockList: stocks,
+	}, nil
 }
 
 func stringToFloatPointer(s string) *float64 {
@@ -55,15 +59,15 @@ func stringToFloatPointer(s string) *float64 {
 	return &f
 }
 
-func (r *StockRepository) ReadCSV(reader *csv.Reader) ([]entity.Stock, error) {
-	var stocks []entity.Stock
+func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StockList, error) {
+	var stocks []*entity.Stock
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return nil, err
+			return entity.StockList{}, err
 		}
 
 		// 1行目をスルー
@@ -73,10 +77,10 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) ([]entity.Stock, error) {
 
 		date, err := time.Parse("20060102", record[4])
 		if err != nil {
-			return nil, err
+			return entity.StockList{}, err
 		}
 
-		stocks = append(stocks, entity.Stock{
+		stocks = append(stocks, &entity.Stock{
 			StockCode:     record[0],
 			StockName:     record[1],
 			Market:        record[2],
@@ -97,7 +101,9 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) ([]entity.Stock, error) {
 		})
 	}
 
-	return stocks, nil
+	return entity.StockList{
+		StockList: stocks,
+	}, nil
 }
 
 func (r *StockRepository) FindRandomSC() (string, error) {

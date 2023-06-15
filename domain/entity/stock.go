@@ -24,6 +24,10 @@ type Stock struct {
 	UpdatedAt     time.Time
 }
 
+func (s *Stock) Stock() *Stock {
+	return s
+}
+
 func (s *Stock) PriceVal() float64 {
 	if s.Price == nil {
 		return 0

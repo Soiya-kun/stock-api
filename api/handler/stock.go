@@ -1,10 +1,12 @@
 package handler
 
 import (
-	"github.com/labstack/echo/v4"
-	"gitlab.com/soy-app/stock-api/api/middleware"
-	"go.uber.org/zap"
 	"net/http"
+
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
+
+	"gitlab.com/soy-app/stock-api/api/middleware"
 
 	"gitlab.com/soy-app/stock-api/api/schema"
 	"gitlab.com/soy-app/stock-api/log"
@@ -35,7 +37,7 @@ func (h *StockHandler) Create(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusCreated, schema.StockListResFromEntity(res))
+	return c.JSON(http.StatusCreated, schema.StocksResFromEntity(&res))
 }
 
 func (h *StockHandler) FindBySC(c echo.Context) error {
@@ -53,7 +55,7 @@ func (h *StockHandler) FindBySC(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, schema.StocksResFromEntity(res))
+	return c.JSON(http.StatusOK, schema.StocksResFromEntity(&res))
 }
 
 func (h *StockHandler) FindByRandom(c echo.Context) error {
@@ -65,7 +67,7 @@ func (h *StockHandler) FindByRandom(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, schema.StocksResFromEntity(res))
+	return c.JSON(http.StatusOK, schema.StocksResFromEntity(&res))
 }
 
 func (h *StockHandler) SaveSC(c echo.Context) error {

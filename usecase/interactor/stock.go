@@ -13,10 +13,10 @@ func NewStockUseCase(stockRepo port.StockRepository) IStockUseCase {
 	return &StockUseCase{stockRepo: stockRepo}
 }
 
-func (s StockUseCase) CreateStocks(creates []StockCreate) ([]entity.Stock, error) {
-	stocks := make([]entity.Stock, len(creates))
+func (s StockUseCase) CreateStocks(creates []StockCreate) (entity.StockList, error) {
+	stocks := make([]*entity.Stock, len(creates))
 	for i, c := range creates {
-		stocks[i] = entity.Stock{
+		stocks[i] = &entity.Stock{
 			StockCode:     c.StockCode,
 			StockName:     c.StockName,
 			Market:        c.Market,
@@ -36,41 +36,50 @@ func (s StockUseCase) CreateStocks(creates []StockCreate) ([]entity.Stock, error
 			UpperLimit:    c.UpperLimit,
 		}
 	}
-	err := s.stockRepo.Create(stocks)
+	err := s.stockRepo.Create(entity.StockList{StockList: stocks})
 	if err != nil {
-		return nil, err
+		return entity.StockList{}, err
 	}
-	return stocks, nil
+	return entity.StockList{
+		StockList: stocks,
+	}, nil
 }
 
-func (s StockUseCase) FindByStockCode(sc string) ([]*entity.Stock, error) {
+func (s StockUseCase) FindByStockCode(sc string) (entity.StockList, error) {
 	res, err := s.stockRepo.FindByStockCode(sc)
 	if err != nil {
-		return nil, err
+		return entity.StockList{}, err
 	}
 
 	splits, err := s.stockRepo.FindStockSplitsByStockCode(sc)
 	if err != nil {
-		return nil, err
-	}
-	if len(splits) == 0 {
-		return res, nil
+		return entity.StockList{}, err
 	}
 
-	stocks := entity.StockList{
-		Stocks:      res,
+	return entity.StockList{
+		StockList:   res.Stocks(),
 		StockSplits: splits,
-	}
-	return stocks.GetStocksAfterApplyingSplit(), nil
+	}, nil
 }
 
-func (s StockUseCase) FindByRandom() ([]*entity.Stock, error) {
+func (s StockUseCase) FindByRandom() (entity.StockList, error) {
 	sc, err := s.stockRepo.FindRandomSC()
 	if err != nil {
-		return nil, err
+		return entity.StockList{}, err
 	}
 
-	return s.stockRepo.FindByStockCode(sc)
+	res, err := s.stockRepo.FindByStockCode(sc)
+	if err != nil {
+		return entity.StockList{}, err
+	}
+
+	splits, err := s.stockRepo.FindStockSplitsByStockCode(sc)
+	if err != nil {
+		return entity.StockList{}, err
+	}
+
+	res.StockSplits = splits
+	return res, nil
 }
 
 func (s StockUseCase) SaveStockCode(sc string, user entity.User) error {
