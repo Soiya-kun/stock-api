@@ -23,6 +23,9 @@ func (s *StocksCalc) AveragePrice() float64 {
 
 func (s *StocksCalc) CalcMA(day int) {
 	for i, stock := range s.Stocks {
+		if i < day {
+			continue
+		}
 		ss := s.getByIdxRange(i-day, i)
 		stock.Ma[day] = ss.AveragePrice()
 	}
