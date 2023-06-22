@@ -1,32 +1,24 @@
 package entity
 
 import (
-	"fmt"
 	"sort"
 )
 
-type StockPattern struct {
+type SearchStockPattern struct {
+	SearchStockPatternID string `gorm:"primaryKey;size:30;not null"`
+	UserID               string
+	User                 User `gorm:"constraint:OnDelete:CASCADE"`
 	// Volume
-	MaxVolumeInDaysIsOverAverage struct {
-		Day         int     // N日間
-		OverAverage float64 // 平均出来高の何倍か
-	} // N日間のうちの最大出来高が平均出来高の何倍か
-
+	MaxVolumeInDaysIsOverAverage *MaxVolumeInDaysIsOverAverage
 	// PriceRank
-	PricePattern []struct {
-		PriceRank       *int // "終値"の順位
-		OpenedPriceRank *int // "始値"の順位
-		HighRank        *int // "高値"の順位
-		LowRank         *int // "安値"の順位
-	}
-
+	PricePatterns []*PricePattern
 	// Ma
-	MaXUpDownPattern map[int][]bool // key:Maの日数 true: 上昇, false: 下降
+	MaXUpDownPatterns []*MaXUpDownPattern
 }
 
 // IsMaxVolumeInDaysOverAverage
 // N日間のうちの最大出来高が平均出来高の何倍か
-func (s *StockPattern) IsMaxVolumeInDaysOverAverage(sc StocksCalc) bool {
+func (s *SearchStockPattern) IsMaxVolumeInDaysOverAverage(sc StocksCalc) bool {
 	maxVolume := sc.MaxVolume(
 		len(sc.Stocks)-s.MaxVolumeInDaysIsOverAverage.Day,
 		len(sc.Stocks)-1,
@@ -34,7 +26,7 @@ func (s *StockPattern) IsMaxVolumeInDaysOverAverage(sc StocksCalc) bool {
 	return maxVolume > sc.AverageVolume(
 		len(sc.Stocks)-s.MaxVolumeInDaysIsOverAverage.Day,
 		len(sc.Stocks)-1,
-	)*s.MaxVolumeInDaysIsOverAverage.OverAverage
+	)*s.MaxVolumeInDaysIsOverAverage.RatioOverAverage
 }
 
 // IsMatchPricePattern
@@ -46,14 +38,14 @@ func (s *StockPattern) IsMaxVolumeInDaysOverAverage(sc StocksCalc) bool {
 // 4: 1日目のendPrice
 // 5: 2日目のstartPrice
 // 6: 2日目のHigh...
-func (s *StockPattern) IsMatchPricePattern(sc StocksCalc) bool {
+func (s *SearchStockPattern) IsMatchPricePattern(sc StocksCalc) bool {
 	type indexedStock struct {
 		price float64
 		index int
 	}
-	indexedStocks := make([]indexedStock, len(s.PricePattern)*4)
+	indexedStocks := make([]indexedStock, len(s.PricePatterns)*4)
 	for i, s := range sc.getByIdxRange(
-		len(sc.Stocks)-len(s.PricePattern),
+		len(sc.Stocks)-len(s.PricePatterns),
 		len(sc.Stocks)).Stocks {
 		indexedStocks[i*4] = indexedStock{price: s.OpenedPriceVal(), index: i * 4}
 		indexedStocks[i*4+2] = indexedStock{price: s.LowVal(), index: i*4 + 2}
@@ -68,8 +60,8 @@ func (s *StockPattern) IsMatchPricePattern(sc StocksCalc) bool {
 		rank  *int
 		index int
 	}
-	indexedRanks := make([]indexedRank, len(s.PricePattern)*4)
-	for i, pattern := range s.PricePattern {
+	indexedRanks := make([]indexedRank, len(s.PricePatterns)*4)
+	for i, pattern := range s.PricePatterns {
 		indexedRanks[i*4] = indexedRank{rank: pattern.OpenedPriceRank, index: i * 4}
 		indexedRanks[i*4+1] = indexedRank{rank: pattern.HighRank, index: i*4 + 1}
 		indexedRanks[i*4+2] = indexedRank{rank: pattern.LowRank, index: i*4 + 2}
@@ -86,7 +78,6 @@ func (s *StockPattern) IsMatchPricePattern(sc StocksCalc) bool {
 	})
 
 	for i, rank := range indexedRanks {
-		fmt.Println("rank", rank, "stock", indexedStocks[i])
 		if rank.rank == nil {
 			continue
 		}
@@ -99,14 +90,14 @@ func (s *StockPattern) IsMatchPricePattern(sc StocksCalc) bool {
 
 // IsMatchMaXUpDownPattern
 // StockPatternのMaXUpDownPatternに一致するかどうか
-func (s *StockPattern) IsMatchMaXUpDownPattern(sc StocksCalc) bool {
-	for i, pattern := range s.MaXUpDownPattern {
-		verifiedStocks := sc.Stocks[len(sc.Stocks)-len(pattern)-1:]
+func (s *SearchStockPattern) IsMatchMaXUpDownPattern(sc StocksCalc) bool {
+	for i, p := range s.MaXUpDownPatterns {
+		verifiedStocks := sc.Stocks[len(sc.Stocks)-len(p.Pattern)-1:]
 		for j := range verifiedStocks {
 			if j == 0 {
 				continue
 			}
-			if (verifiedStocks[j].Ma[i] > verifiedStocks[j-1].Ma[i]) != pattern[j-1] {
+			if (verifiedStocks[j].Ma[i] > verifiedStocks[j-1].Ma[i]) != p.IndexBool(j-1) {
 				return false
 			}
 		}

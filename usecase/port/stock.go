@@ -23,4 +23,5 @@ type StockRepository interface {
 	ListSC() ([]string, error)
 	CreateStockSplit(entity.StockSplit) error
 	FindStockSplitsByStockCode(string) ([]entity.StockSplit, error)
+	SaveSearchCondition(pattern entity.SearchStockPattern) error
 }
