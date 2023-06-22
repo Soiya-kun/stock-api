@@ -1,16 +1,18 @@
 package interactor
 
 import (
+	"gitlab.com/soy-app/stock-api/domain/constructor"
 	"gitlab.com/soy-app/stock-api/domain/entity"
 	"gitlab.com/soy-app/stock-api/usecase/port"
 )
 
 type StockUseCase struct {
+	ulid      port.ULID
 	stockRepo port.StockRepository
 }
 
-func NewStockUseCase(stockRepo port.StockRepository) IStockUseCase {
-	return &StockUseCase{stockRepo: stockRepo}
+func NewStockUseCase(ulid port.ULID, stockRepo port.StockRepository) IStockUseCase {
+	return &StockUseCase{ulid: ulid, stockRepo: stockRepo}
 }
 
 func (s StockUseCase) CreateStocks(creates []StockCreate) (entity.StockList, error) {
@@ -97,4 +99,43 @@ func (s StockUseCase) CreateStockSplit(create StockSplitCreate) error {
 			Date:       create.Date,
 			SplitRatio: create.SplitRatio,
 		})
+}
+
+func (s StockUseCase) SaveSearchCondition(create SearchConditionCreate, user entity.User) error {
+	SearchCondition := constructor.NewSearchStockPatternCreate(
+		s.ulid,
+		user.UserID,
+		constructor.NewMaxVolumeInDaysIsOverAverageCreate(
+			s.ulid,
+			create.MaxVolumeInDaysIsOverAverage.Day,
+			create.MaxVolumeInDaysIsOverAverage.OverAverage,
+		),
+		func() []*entity.PricePattern {
+			ret := make([]*entity.PricePattern, len(create.PricePatterns))
+			for i, p := range create.PricePatterns {
+				pEnt := constructor.NewPricePatternCreate(
+					s.ulid,
+					p.PriceRank,
+					p.OpenedPriceRank,
+					p.HighRank,
+					p.LowRank,
+				)
+				ret[i] = &pEnt
+			}
+			return ret
+		}(),
+		func() []*entity.MaXUpDownPattern {
+			ret := make([]*entity.MaXUpDownPattern, len(create.MaXUpDownPatterns))
+			for i, p := range create.MaXUpDownPatterns {
+				pEnt := constructor.NewMaXUpDownPatternCreate(
+					s.ulid,
+					p.MaX,
+					p.Pattern,
+				)
+				ret[i] = &pEnt
+			}
+			return ret
+		}(),
+	)
+	return s.stockRepo.SaveSearchCondition(SearchCondition)
 }

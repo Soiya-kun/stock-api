@@ -32,6 +32,29 @@ type StockSplitCreate struct {
 	SplitRatio float64
 }
 
+type MaxVolumeInDaysIsOverAverageCreate struct {
+	Day         int
+	OverAverage float64
+}
+
+type PricePatternCreate struct {
+	PriceRank       *int // "終値"の順位
+	OpenedPriceRank *int // "始値"の順位
+	HighRank        *int // "高値"の順位
+	LowRank         *int // "安値"の順位
+}
+
+type MaXUpDownPatternCreate struct {
+	MaX     int
+	Pattern []bool // false, false, true, true, ...
+}
+
+type SearchConditionCreate struct {
+	MaxVolumeInDaysIsOverAverage MaxVolumeInDaysIsOverAverageCreate
+	PricePatterns                []PricePatternCreate
+	MaXUpDownPatterns            []MaXUpDownPatternCreate
+}
+
 type IStockUseCase interface {
 	CreateStocks([]StockCreate) (entity.StockList, error)
 	FindByStockCode(string) (entity.StockList, error)
@@ -39,4 +62,5 @@ type IStockUseCase interface {
 	SaveStockCode(sc string, u entity.User) error
 	ListSC() ([]string, error)
 	CreateStockSplit(StockSplitCreate) error
+	SaveSearchCondition(SearchConditionCreate, entity.User) error
 }

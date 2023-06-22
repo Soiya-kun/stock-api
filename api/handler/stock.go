@@ -130,3 +130,28 @@ func (h *StockHandler) CreateSplit(c echo.Context) error {
 
 	return c.JSON(http.StatusCreated, nil)
 }
+
+func (h *StockHandler) SaveSearchStockPattern(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	req := &schema.SaveSearchConditionReq{}
+	if err := c.Bind(req); err != nil {
+		logger.Error("Failed to bind request", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	user, err := middleware.GetUserFromContext(ctx)
+	if err != nil {
+		logger.Error("Failed to get user from context", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	err = h.StockUseCase.SaveSearchCondition(req.UsecaseArg(), user)
+	if err != nil {
+		logger.Error("Failed to save search condition", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusCreated, nil)
+}

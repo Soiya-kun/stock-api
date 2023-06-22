@@ -1,13 +1,17 @@
-package entity
+package entity_test
 
-import "testing"
+import (
+	"testing"
 
-func TestStockPattern_IsMatchMaXUpDownPattern(t *testing.T) {
+	"gitlab.com/soy-app/stock-api/domain/entity"
+)
+
+func TestStockPattern_IsMatchMaXUpDownPattern(t *testing.T) { //nolint:paralleltest
 	type fields struct {
-		MaXUpDownPattern map[int][]bool
+		MaXUpDownPattern []*entity.MaXUpDownPattern
 	}
 	type args struct {
-		stocks StocksCalc
+		stocks entity.StocksCalc
 	}
 	tests := []struct {
 		name   string
@@ -18,14 +22,20 @@ func TestStockPattern_IsMatchMaXUpDownPattern(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				MaXUpDownPattern: map[int][]bool{
-					5:  {true, false, true, true, true},
-					20: {true, true, true, true, true},
+				MaXUpDownPattern: []*entity.MaXUpDownPattern{
+					{
+						MaX:     5,
+						Pattern: "10111",
+					},
+					{
+						MaX:     20,
+						Pattern: "11111",
+					},
 				},
 			},
 			args: args{
-				stocks: StocksCalc{
-					Stocks: []*StockCalc{
+				stocks: entity.StocksCalc{
+					Stocks: []*entity.StockCalc{
 						{
 							Ma: map[int]float64{
 								5:  100,
@@ -76,8 +86,8 @@ func TestStockPattern_IsMatchMaXUpDownPattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StockPattern{
-				MaXUpDownPattern: tt.fields.MaXUpDownPattern,
+			s := &entity.SearchStockPattern{
+				MaXUpDownPatterns: tt.fields.MaXUpDownPattern,
 			}
 			if got := s.IsMatchMaXUpDownPattern(tt.args.stocks); got != tt.want {
 				t.Errorf("IsMatchMaXUpDownPattern() = %v, want %v", got, tt.want)
@@ -88,14 +98,10 @@ func TestStockPattern_IsMatchMaXUpDownPattern(t *testing.T) {
 
 func TestStockPattern_IsMaxVolumeInDaysOverAverage(t *testing.T) {
 	type fields struct {
-		MaxVolumeInDaysIsOverAverage struct {
-			Day         int     // N日間
-			OverAverage float64 // 平均出来高の何倍か
-		}
-		MaXUpDownPattern map[int][]bool
+		MaxVolumeInDaysIsOverAverage *entity.MaxVolumeInDaysIsOverAverage
 	}
 	type args struct {
-		sc StocksCalc
+		sc entity.StocksCalc
 	}
 	var tests = []struct {
 		name   string
@@ -106,22 +112,19 @@ func TestStockPattern_IsMaxVolumeInDaysOverAverage(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				MaxVolumeInDaysIsOverAverage: struct {
-					Day         int
-					OverAverage float64
-				}{Day: 5, OverAverage: 1.5},
+				MaxVolumeInDaysIsOverAverage: &entity.MaxVolumeInDaysIsOverAverage{Day: 5, RatioOverAverage: 1.5},
 			},
 			args: args{
-				sc: StocksCalc{
-					Stocks: []*StockCalc{
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 160; return &v }()}},
-						{Stock: Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+				sc: entity.StocksCalc{
+					Stocks: []*entity.StockCalc{
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 160; return &v }()}},
+						{Stock: entity.Stock{Volume: func() *float64 { var v float64 = 100; return &v }()}},
 					},
 				},
 			},
@@ -131,9 +134,8 @@ func TestStockPattern_IsMaxVolumeInDaysOverAverage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StockPattern{
+			s := &entity.SearchStockPattern{
 				MaxVolumeInDaysIsOverAverage: tt.fields.MaxVolumeInDaysIsOverAverage,
-				MaXUpDownPattern:             tt.fields.MaXUpDownPattern,
 			}
 			if got := s.IsMaxVolumeInDaysOverAverage(tt.args.sc); got != tt.want {
 				t.Errorf("IsMaxVolumeInDaysOverAverage() = %v, want %v", got, tt.want)
@@ -144,20 +146,12 @@ func TestStockPattern_IsMaxVolumeInDaysOverAverage(t *testing.T) {
 
 func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 	type fields struct {
-		MaxVolumeInDaysIsOverAverage struct {
-			Day         int     // N日間
-			OverAverage float64 // 平均出来高の何倍か
-		}
-		PricePattern []struct {
-			PriceRank       *int // "終値"の順位
-			OpenedPriceRank *int // "始値"の順位
-			HighRank        *int // "高値"の順位
-			LowRank         *int // "安値"の順位
-		}
-		MaXUpDownPattern map[int][]bool
+		MaxVolumeInDaysIsOverAverage *entity.MaxVolumeInDaysIsOverAverage
+		PricePattern                 []*entity.PricePattern
+		MaXUpDownPatterns            []*entity.MaXUpDownPattern
 	}
 	type args struct {
-		sc StocksCalc
+		sc entity.StocksCalc
 	}
 	tests := []struct {
 		name   string
@@ -168,12 +162,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				PricePattern: []struct {
-					PriceRank       *int
-					OpenedPriceRank *int
-					HighRank        *int
-					LowRank         *int
-				}{
+				PricePattern: []*entity.PricePattern{
 					{
 						OpenedPriceRank: func() *int { v := 1; return &v }(),
 						HighRank:        func() *int { v := 2; return &v }(),
@@ -189,10 +178,10 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 				},
 			},
 			args: args{
-				sc: StocksCalc{
-					Stocks: []*StockCalc{
+				sc: entity.StocksCalc{
+					Stocks: []*entity.StockCalc{
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								Price:       func() *float64 { v := 20.0; return &v }(),
 								OpenedPrice: func() *float64 { v := 0.0; return &v }(),
 								High:        func() *float64 { v := -10.0; return &v }(),
@@ -200,7 +189,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 							},
 						},
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								OpenedPrice: func() *float64 { v := 8.0; return &v }(),
 								High:        func() *float64 { v := 7.0; return &v }(),
 								Low:         func() *float64 { v := 6.0; return &v }(),
@@ -208,7 +197,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 							},
 						},
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								OpenedPrice: func() *float64 { v := 4.0; return &v }(),
 								High:        func() *float64 { v := 3.0; return &v }(),
 								Low:         func() *float64 { v := 2.0; return &v }(),
@@ -223,12 +212,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 		{
 			name: "success",
 			fields: fields{
-				PricePattern: []struct {
-					PriceRank       *int
-					OpenedPriceRank *int
-					HighRank        *int
-					LowRank         *int
-				}{
+				PricePattern: []*entity.PricePattern{
 					{
 						OpenedPriceRank: nil,
 						HighRank:        func() *int { v := 1; return &v }(),
@@ -244,10 +228,10 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 				},
 			},
 			args: args{
-				sc: StocksCalc{
-					Stocks: []*StockCalc{
+				sc: entity.StocksCalc{
+					Stocks: []*entity.StockCalc{
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								Price:       func() *float64 { v := 20.0; return &v }(),
 								OpenedPrice: func() *float64 { v := 0.0; return &v }(),
 								High:        func() *float64 { v := -10.0; return &v }(),
@@ -255,7 +239,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 							},
 						},
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								OpenedPrice: func() *float64 { v := 120.0; return &v }(),
 								High:        func() *float64 { v := 150.0; return &v }(),
 								Low:         func() *float64 { v := 110.0; return &v }(),
@@ -263,7 +247,7 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 							},
 						},
 						{
-							Stock: Stock{
+							Stock: entity.Stock{
 								OpenedPrice: func() *float64 { v := 135.0; return &v }(),
 								High:        func() *float64 { v := 140.0; return &v }(),
 								Low:         func() *float64 { v := 100.0; return &v }(),
@@ -278,10 +262,10 @@ func TestStockPattern_IsMatchPricePattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StockPattern{
+			s := &entity.SearchStockPattern{
 				MaxVolumeInDaysIsOverAverage: tt.fields.MaxVolumeInDaysIsOverAverage,
-				PricePattern:                 tt.fields.PricePattern,
-				MaXUpDownPattern:             tt.fields.MaXUpDownPattern,
+				PricePatterns:                tt.fields.PricePattern,
+				MaXUpDownPatterns:            tt.fields.MaXUpDownPatterns,
 			}
 			if got := s.IsMatchPricePattern(tt.args.sc); got != tt.want {
 				t.Errorf("IsMatchPricePattern() = %v, want %v", got, tt.want)
