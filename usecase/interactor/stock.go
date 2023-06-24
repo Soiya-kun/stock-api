@@ -107,8 +107,8 @@ func (s StockUseCase) SaveSearchCondition(create SearchConditionCreate, user ent
 		user.UserID,
 		constructor.NewMaxVolumeInDaysIsOverAverageCreate(
 			s.ulid,
-			create.MaxVolumeInDaysIsOverAverage.Day,
-			create.MaxVolumeInDaysIsOverAverage.OverAverage,
+			create.VolumePatterns.Day,
+			create.VolumePatterns.OverAverage,
 		),
 		func() []*entity.PricePattern {
 			ret := make([]*entity.PricePattern, len(create.PricePatterns))

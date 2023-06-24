@@ -8,15 +8,15 @@ import (
 func NewSearchStockPatternCreate(
 	ulid port.ULID,
 	userID string,
-	MaxVolumeInDaysIsOverAverage *entity.MaxVolumeInDaysIsOverAverage,
+	MaxVolumeInDaysIsOverAverage *entity.VolumePattern,
 	PricePatterns []*entity.PricePattern,
 	MaXUpDownPatterns []*entity.MaXUpDownPattern,
 ) entity.SearchStockPattern {
 	return entity.SearchStockPattern{
-		SearchStockPatternID:         ulid.New(),
-		UserID:                       userID,
-		MaxVolumeInDaysIsOverAverage: MaxVolumeInDaysIsOverAverage,
-		PricePatterns:                PricePatterns,
-		MaXUpDownPatterns:            MaXUpDownPatterns,
+		SearchStockPatternID: ulid.New(),
+		UserID:               userID,
+		VolumePatterns:       MaxVolumeInDaysIsOverAverage,
+		PricePatterns:        PricePatterns,
+		MaXUpDownPatterns:    MaXUpDownPatterns,
 	}
 }

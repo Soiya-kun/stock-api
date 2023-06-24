@@ -9,14 +9,14 @@ func NewMaxVolumeInDaysIsOverAverageCreate(
 	ulid port.ULID,
 	day int,
 	ratioOverAverage float64,
-) *entity.MaxVolumeInDaysIsOverAverage {
+) *entity.VolumePattern {
 	if day == 0 {
 		return nil
 	}
-	return &entity.MaxVolumeInDaysIsOverAverage{
-		MaxVolumeInDaysIsOverAverageID: ulid.New(),
-		Day:                            day,
-		RatioOverAverage:               ratioOverAverage,
+	return &entity.VolumePattern{
+		VolumePatternID:  ulid.New(),
+		Day:              day,
+		RatioOverAverage: ratioOverAverage,
 	}
 }
 
@@ -28,11 +28,11 @@ func NewPricePatternCreate(
 	lowRank *int,
 ) entity.PricePattern {
 	return entity.PricePattern{
-		PricePatternID:  ulid.New(),
-		PriceRank:       priceRank,
-		OpenedPriceRank: openedPriceRank,
-		HighRank:        highRank,
-		LowRank:         lowRank,
+		PricePatternID: ulid.New(),
+		ClosedPoint:    priceRank,
+		OpenedPoint:    openedPriceRank,
+		HighPoint:      highRank,
+		LowPoint:       lowRank,
 	}
 }
 

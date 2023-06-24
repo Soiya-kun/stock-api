@@ -32,17 +32,30 @@ type StockSplitCreate struct {
 	SplitRatio float64
 }
 
-type MaxVolumeInDaysIsOverAverageCreate struct {
-	Day         int
-	OverAverage float64
+type VolumePatternCreate struct {
+	VolumePoint *float64
+	IsOver      *bool
+	IsMatchRank bool
 }
 
+type VolumePatternsCreate []VolumePatternCreate
+
 type PricePatternCreate struct {
-	PriceRank       *int // "終値"の順位
-	OpenedPriceRank *int // "始値"の順位
-	HighRank        *int // "高値"の順位
-	LowRank         *int // "安値"の順位
+	ClosedPoint            *float64
+	IsClosedPointOver      *bool
+	IsClosedPointMatchRank bool
+	OpenedPoint            *float64
+	IsOpenedPointOver      *bool
+	IsOpenedPointMatchRank bool
+	HighPoint              *float64
+	IsHighPointOver        *bool
+	IsHighPointMatchRank   bool
+	LowPoint               *float64
+	IsLowPointOver         *bool
+	IsLowPointMatchRank    bool
 }
+
+type PricePatternsCreate []PricePatternCreate
 
 type MaXUpDownPatternCreate struct {
 	MaX     int
@@ -50,9 +63,9 @@ type MaXUpDownPatternCreate struct {
 }
 
 type SearchConditionCreate struct {
-	MaxVolumeInDaysIsOverAverage MaxVolumeInDaysIsOverAverageCreate
-	PricePatterns                []PricePatternCreate
-	MaXUpDownPatterns            []MaXUpDownPatternCreate
+	VolumePatterns    VolumePatternsCreate
+	PricePatterns     PricePatternsCreate
+	MaXUpDownPatterns []MaXUpDownPatternCreate
 }
 
 type IStockUseCase interface {

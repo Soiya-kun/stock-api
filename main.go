@@ -58,7 +58,7 @@ func main() {
 	userUC := interactor.NewUserUseCase(mailDriver, ulidDriver, userAuth, userRepo)
 
 	stockRepo := repository.NewStockRepository(db)
-	stockUC := interactor.NewStockUseCase(stockRepo)
+	stockUC := interactor.NewStockUseCase(ulidDriver, stockRepo)
 
 	s := router.NewServer(
 		userUC,

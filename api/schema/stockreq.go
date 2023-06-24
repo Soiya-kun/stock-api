@@ -37,20 +37,29 @@ type StockSplitReq struct {
 }
 
 type SaveSearchConditionReq struct {
-	MaxVolumeInDaysIsOverAverage struct {
-		Day         int     `json:"day"`
-		OverAverage float64 `json:"overAverage"`
-	} `json:"maxVolumeInDaysIsOverAverage"`
+	VolumePatterns []struct {
+		VolumePoint *float64 `json:"volumePoint"`
+		IsOver      *bool    `json:"isOver"`
+		IsMatchRank bool     `json:"isMatchRank"`
+	} `json:"volumePatterns"`
 
 	PricePatterns []struct {
-		PriceRank       *int `json:"priceRank"`
-		OpenedPriceRank *int `json:"openedPriceRank"`
-		HighRank        *int `json:"highRank"`
-		LowRank         *int `json:"lowRank"`
+		ClosedPoint            *float64 `json:"closedPoint"`
+		IsClosedPointOver      *bool    `json:"isClosedPointOver"`
+		IsClosedPointMatchRank bool     `json:"isClosedPointMatchRank"`
+		OpenedPoint            *float64 `json:"openedPoint"`
+		IsOpenedPointOver      *bool    `json:"isOpenedPointOver"`
+		IsOpenedPointMatchRank bool     `json:"isOpenedPointMatchRank"`
+		HighPoint              *float64 `json:"highPoint"`
+		IsHighPointOver        *bool    `json:"isHighPointOver"`
+		IsHighPointMatchRank   bool     `json:"isHighPointMatchRank"`
+		LowPoint               *float64 `json:"lowPoint"`
+		IsLowPointOver         *bool    `json:"isLowPointOver"`
+		IsLowPointMatchRank    bool     `json:"isLowPointMatchRank"`
 	} `json:"pricePatterns"`
 
 	MaXUpDownPatterns []struct {
-		MaX     int    `json:"MaX"`
+		MaX     int    `json:"maX"`
 		Pattern []bool `json:"pattern"`
 	} `json:"maXUpDownPatterns"`
 }

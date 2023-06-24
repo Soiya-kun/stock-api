@@ -143,3 +143,7 @@ func (r *StockRepository) FindStockSplitsByStockCode(s string) ([]entity.StockSp
 	}
 	return splits, nil
 }
+
+func (r *StockRepository) SaveSearchCondition(pattern entity.SearchStockPattern) error {
+	return r.db.Create(&pattern).Error
+}

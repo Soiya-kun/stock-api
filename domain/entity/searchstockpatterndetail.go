@@ -1,20 +1,23 @@
 package entity
 
-type MaxVolumeInDaysIsOverAverage struct {
-	MaxVolumeInDaysIsOverAverageID string `gorm:"primaryKey;size:30;not null"`
-	SearchStockPatternID           string
-	Day                            int     // N日間
-	RatioOverAverage               float64 // 平均出来高の何倍か 1.5, 3.0...
+type VolumePattern struct {
+	VolumePatternID      string `gorm:"primaryKey;size:26;not null"`
+	SearchStockPatternID string
+	SearchStockPattern   SearchStockPattern
+	ArrIndex             int
+	VolumePoint          *float64
+	IsOver               *bool
+	IsMatchRank          bool
 }
 
 type PricePattern struct {
 	PricePatternID       string `gorm:"primaryKey;size:30;not null"`
 	SearchStockPatternID string
 	SearchStockPattern   SearchStockPattern
-	PriceRank            *int // "終値"の順位
-	OpenedPriceRank      *int // "始値"の順位
-	HighRank             *int // "高値"の順位
-	LowRank              *int // "安値"の順位
+	ArrIndex             int // %4=0: OpenedPrice, %4=1: HighPrice, %4=2: LowPrice, %4=3: ClosedPrice
+	PricePoint           *float64
+	IsOver               *bool
+	IsMatchRank          bool
 }
 
 type MaXUpDownPattern struct {

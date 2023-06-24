@@ -5,18 +5,33 @@ import "gitlab.com/soy-app/stock-api/usecase/interactor"
 func (s *SaveSearchConditionReq) UsecaseArg() interactor.SearchConditionCreate {
 	return func() interactor.SearchConditionCreate {
 		return interactor.SearchConditionCreate{
-			MaxVolumeInDaysIsOverAverage: interactor.MaxVolumeInDaysIsOverAverageCreate{
-				Day:         s.MaxVolumeInDaysIsOverAverage.Day,
-				OverAverage: s.MaxVolumeInDaysIsOverAverage.OverAverage,
-			},
+			VolumePatterns: func() interactor.VolumePatternsCreate {
+				ret := make(interactor.VolumePatternsCreate, len(s.VolumePatterns))
+				for i, v := range s.VolumePatterns {
+					ret[i] = interactor.VolumePatternCreate{
+						VolumePoint: v.VolumePoint,
+						IsOver:      v.IsOver,
+						IsMatchRank: v.IsMatchRank,
+					}
+				}
+				return ret
+			}(),
 			PricePatterns: func() []interactor.PricePatternCreate {
 				ret := make([]interactor.PricePatternCreate, len(s.PricePatterns))
 				for i, v := range s.PricePatterns {
 					ret[i] = interactor.PricePatternCreate{
-						PriceRank:       v.PriceRank,
-						OpenedPriceRank: v.OpenedPriceRank,
-						HighRank:        v.HighRank,
-						LowRank:         v.LowRank,
+						ClosedPoint:            v.ClosedPoint,
+						IsClosedPointOver:      v.IsClosedPointOver,
+						IsClosedPointMatchRank: v.IsClosedPointMatchRank,
+						OpenedPoint:            v.OpenedPoint,
+						IsOpenedPointOver:      v.IsOpenedPointOver,
+						IsOpenedPointMatchRank: v.IsOpenedPointMatchRank,
+						HighPoint:              v.HighPoint,
+						IsHighPointOver:        v.IsHighPointOver,
+						IsHighPointMatchRank:   v.IsHighPointMatchRank,
+						LowPoint:               v.LowPoint,
+						IsLowPointOver:         v.IsLowPointOver,
+						IsLowPointMatchRank:    v.IsLowPointMatchRank,
 					}
 				}
 				return ret
