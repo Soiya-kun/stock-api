@@ -5,34 +5,35 @@ import (
 	"gitlab.com/soy-app/stock-api/usecase/port"
 )
 
-func NewMaxVolumeInDaysIsOverAverageCreate(
-	ulid port.ULID,
-	day int,
-	ratioOverAverage float64,
+func NewVolumePattern(
+	ulid string,
+	ArrIndex int,
+	VolumePoint *float64,
+	IsOver *bool,
+	IsMatchRank bool,
 ) *entity.VolumePattern {
-	if day == 0 {
-		return nil
-	}
 	return &entity.VolumePattern{
-		VolumePatternID:  ulid.New(),
-		Day:              day,
-		RatioOverAverage: ratioOverAverage,
+		VolumePatternID: ulid,
+		ArrIndex:        ArrIndex,
+		VolumePoint:     VolumePoint,
+		IsOver:          IsOver,
+		IsMatchRank:     IsMatchRank,
 	}
 }
 
 func NewPricePatternCreate(
-	ulid port.ULID,
-	priceRank *int,
-	openedPriceRank *int,
-	highRank *int,
-	lowRank *int,
+	ulid string,
+	ArrIndex int,
+	PricePoint *float64,
+	IsOver *bool,
+	IsMatchRank bool,
 ) entity.PricePattern {
 	return entity.PricePattern{
-		PricePatternID: ulid.New(),
-		ClosedPoint:    priceRank,
-		OpenedPoint:    openedPriceRank,
-		HighPoint:      highRank,
-		LowPoint:       lowRank,
+		PricePatternID: ulid,
+		ArrIndex:       ArrIndex,
+		PricePoint:     PricePoint,
+		IsOver:         IsOver,
+		IsMatchRank:    IsMatchRank,
 	}
 }
 

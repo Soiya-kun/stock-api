@@ -2,21 +2,20 @@ package constructor
 
 import (
 	"gitlab.com/soy-app/stock-api/domain/entity"
-	"gitlab.com/soy-app/stock-api/usecase/port"
 )
 
 func NewSearchStockPatternCreate(
-	ulid port.ULID,
+	ulid string,
 	userID string,
-	MaxVolumeInDaysIsOverAverage *entity.VolumePattern,
-	PricePatterns []*entity.PricePattern,
+	volumePatterns entity.VolumePatterns,
+	pricePatterns entity.PricePatterns,
 	MaXUpDownPatterns []*entity.MaXUpDownPattern,
 ) entity.SearchStockPattern {
 	return entity.SearchStockPattern{
-		SearchStockPatternID: ulid.New(),
+		SearchStockPatternID: ulid,
 		UserID:               userID,
-		VolumePatterns:       MaxVolumeInDaysIsOverAverage,
-		PricePatterns:        PricePatterns,
+		VolumePatterns:       volumePatterns,
+		PricePatterns:        pricePatterns,
 		MaXUpDownPatterns:    MaXUpDownPatterns,
 	}
 }

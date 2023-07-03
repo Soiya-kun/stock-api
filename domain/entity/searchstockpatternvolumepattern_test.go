@@ -1,8 +1,9 @@
 package entity_test
 
 import (
-	"gitlab.com/soy-app/stock-api/domain/entity"
 	"testing"
+
+	"gitlab.com/soy-app/stock-api/domain/entity"
 )
 
 func floatPointer(f float64) *float64 {

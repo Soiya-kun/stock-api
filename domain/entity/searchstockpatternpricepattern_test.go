@@ -1,8 +1,9 @@
 package entity_test
 
 import (
-	"gitlab.com/soy-app/stock-api/domain/entity"
 	"testing"
+
+	"gitlab.com/soy-app/stock-api/domain/entity"
 )
 
 func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {

@@ -103,24 +103,57 @@ func (s StockUseCase) CreateStockSplit(create StockSplitCreate) error {
 
 func (s StockUseCase) SaveSearchCondition(create SearchConditionCreate, user entity.User) error {
 	SearchCondition := constructor.NewSearchStockPatternCreate(
-		s.ulid,
+		s.ulid.New(),
 		user.UserID,
-		constructor.NewMaxVolumeInDaysIsOverAverageCreate(
-			s.ulid,
-			create.VolumePatterns.Day,
-			create.VolumePatterns.OverAverage,
-		),
-		func() []*entity.PricePattern {
-			ret := make([]*entity.PricePattern, len(create.PricePatterns))
-			for i, p := range create.PricePatterns {
-				pEnt := constructor.NewPricePatternCreate(
-					s.ulid,
-					p.PriceRank,
-					p.OpenedPriceRank,
-					p.HighRank,
-					p.LowRank,
+		func() entity.VolumePatterns {
+			ret := make(entity.VolumePatterns, len(create.VolumePatterns))
+			for i, p := range create.VolumePatterns {
+				pEnt := constructor.NewVolumePattern(
+					s.ulid.New(),
+					i,
+					p.VolumePoint,
+					p.IsOver,
+					p.IsMatchRank,
 				)
-				ret[i] = &pEnt
+				ret[i] = pEnt
+			}
+			return ret
+		}(),
+		func() []*entity.PricePattern {
+			ret := make([]*entity.PricePattern, len(create.PricePatterns)*4)
+			for i, p := range create.PricePatterns {
+				pOpen := constructor.NewPricePatternCreate(
+					s.ulid.New(),
+					i*4,
+					p.OpenedPoint,
+					p.IsClosedPointOver,
+					p.IsClosedPointMatchRank,
+				)
+				ret[i*4] = &pOpen
+				pHigh := constructor.NewPricePatternCreate(
+					s.ulid.New(),
+					i*4+1,
+					p.HighPoint,
+					p.IsHighPointOver,
+					p.IsHighPointMatchRank,
+				)
+				ret[i*4+1] = &pHigh
+				pLow := constructor.NewPricePatternCreate(
+					s.ulid.New(),
+					i*4+2,
+					p.LowPoint,
+					p.IsLowPointOver,
+					p.IsLowPointMatchRank,
+				)
+				ret[i*4+2] = &pLow
+				pClose := constructor.NewPricePatternCreate(
+					s.ulid.New(),
+					i*4+3,
+					p.ClosedPoint,
+					p.IsClosedPointOver,
+					p.IsClosedPointMatchRank,
+				)
+				ret[i*4+3] = &pClose
 			}
 			return ret
 		}(),
