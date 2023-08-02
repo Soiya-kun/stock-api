@@ -68,12 +68,18 @@ type SearchConditionCreate struct {
 	MaXUpDownPatterns []MaXUpDownPatternCreate
 }
 
+type SearchReq struct {
+	SearchPatternID string
+	EndDate         time.Time
+}
+
 type IStockUseCase interface {
-	CreateStocks([]StockCreate) (entity.StockList, error)
-	FindByStockCode(string) (entity.StockList, error)
-	FindByRandom() (entity.StockList, error)
+	CreateStocks([]StockCreate) (entity.StocksWithSplits, error)
+	FindByStockCode(string) (entity.StocksWithSplits, error)
+	FindByRandom() (entity.StocksWithSplits, error)
 	SaveStockCode(sc string, u entity.User) error
 	ListSC() ([]string, error)
 	CreateStockSplit(StockSplitCreate) error
 	SaveSearchCondition(SearchConditionCreate, entity.User) error
+	SearchByCondition(SearchReq) ([]string, error) // return stockCode
 }

@@ -3,17 +3,12 @@ package main
 import (
 	"fmt"
 	"os"
-
-	"gitlab.com/soy-app/stock-api/adapter/email"
-
-	"gitlab.com/soy-app/stock-api/adapter/aws"
+	"time"
 
 	"go.uber.org/zap"
 
-	"gitlab.com/soy-app/stock-api/adapter/authentication"
 	"gitlab.com/soy-app/stock-api/adapter/database"
 	"gitlab.com/soy-app/stock-api/adapter/ulid"
-	"gitlab.com/soy-app/stock-api/api/router"
 	"gitlab.com/soy-app/stock-api/interface/repository"
 	"gitlab.com/soy-app/stock-api/log"
 	"gitlab.com/soy-app/stock-api/usecase/interactor"
@@ -42,33 +37,20 @@ func main() {
 			logger.Error("Failed to close database connection", zap.Error(err))
 		}
 	}()
-
-	err = database.Migrate(db)
-	if err != nil {
-		logger.Error("Failed to migrate", zap.Error(err))
-		return
-	}
-
-	awsCli := aws.NewCli()
-	mailDriver := email.NewEmailDriver(awsCli)
 	ulidDriver := ulid.NewULID()
-
-	userRepo := repository.NewUserRepository(db, ulidDriver)
-	userAuth := authentication.NewUserAuth()
-	userUC := interactor.NewUserUseCase(mailDriver, ulidDriver, userAuth, userRepo)
-
 	stockRepo := repository.NewStockRepository(db)
 	searchStockPatternRepo := repository.NewSearchStockPatternRepository(db)
 	searchedStockRepo := repository.NewSearchedStockPatternRepository(db)
 	stockUC := interactor.NewStockUseCase(ulidDriver, stockRepo, searchStockPatternRepo, searchedStockRepo)
 
-	s := router.NewServer(
-		userUC,
-		stockUC,
-	)
+	ret, err := stockUC.SearchByCondition(interactor.SearchReq{
+		SearchPatternID: "",
+		EndDate:         time.Time{},
+	})
 
-	if err := s.Start(":80"); err != nil {
-		logger.Error("Failed to start server", zap.Error(err))
-		os.Exit(1)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
+	fmt.Println(ret)
 }

@@ -66,7 +66,7 @@ func (s *SearchStockPattern) IsMatchVolumePatterns(sc StocksCalc) bool {
 
 	passCount := 0
 	for i, pattern := range s.VolumePatterns {
-		if pattern.IsMatchRank == false {
+		if !pattern.IsMatchRank {
 			passCount++
 			continue
 		}

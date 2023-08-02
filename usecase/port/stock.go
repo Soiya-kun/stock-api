@@ -11,17 +11,16 @@ type Stock interface {
 }
 
 type StockList interface {
-	Stocks() []*entity.Stock
+	Stocks() entity.Stocks
 }
 
 type StockRepository interface {
-	Create(list entity.StockList) error
-	ReadCSV(reader *csv.Reader) (entity.StockList, error)
-	FindByStockCode(string) (entity.StockList, error)
+	Create(list entity.StocksWithSplits) error
+	ReadCSV(reader *csv.Reader) (entity.StocksWithSplits, error)
+	FindByStockCode(string) (entity.StocksWithSplits, error)
 	FindRandomSC() (string, error)
 	SaveStockCode(sc, userID string) error
 	ListSC() ([]string, error)
 	CreateStockSplit(entity.StockSplit) error
 	FindStockSplitsByStockCode(string) ([]entity.StockSplit, error)
-	SaveSearchCondition(pattern entity.SearchStockPattern) error
 }

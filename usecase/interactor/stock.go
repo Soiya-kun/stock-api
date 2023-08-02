@@ -7,15 +7,27 @@ import (
 )
 
 type StockUseCase struct {
-	ulid      port.ULID
-	stockRepo port.StockRepository
+	ulid                           port.ULID
+	stockRepo                      port.StockRepository
+	searchStockPatternRepo         port.SearchStockPatternRepository
+	searchedStockPatternRepository port.SearchedStockPatternRepository
 }
 
-func NewStockUseCase(ulid port.ULID, stockRepo port.StockRepository) IStockUseCase {
-	return &StockUseCase{ulid: ulid, stockRepo: stockRepo}
+func NewStockUseCase(
+	ulid port.ULID,
+	stockRepo port.StockRepository,
+	searchStockPatternRepo port.SearchStockPatternRepository,
+	searchedStockPatternRepository port.SearchedStockPatternRepository,
+) IStockUseCase {
+	return &StockUseCase{
+		ulid:                           ulid,
+		stockRepo:                      stockRepo,
+		searchStockPatternRepo:         searchStockPatternRepo,
+		searchedStockPatternRepository: searchedStockPatternRepository,
+	}
 }
 
-func (s StockUseCase) CreateStocks(creates []StockCreate) (entity.StockList, error) {
+func (s StockUseCase) CreateStocks(creates []StockCreate) (entity.StocksWithSplits, error) {
 	stocks := make([]*entity.Stock, len(creates))
 	for i, c := range creates {
 		stocks[i] = &entity.Stock{
@@ -38,46 +50,46 @@ func (s StockUseCase) CreateStocks(creates []StockCreate) (entity.StockList, err
 			UpperLimit:    c.UpperLimit,
 		}
 	}
-	err := s.stockRepo.Create(entity.StockList{StockList: stocks})
+	err := s.stockRepo.Create(entity.StocksWithSplits{StockList: stocks})
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
-	return entity.StockList{
+	return entity.StocksWithSplits{
 		StockList: stocks,
 	}, nil
 }
 
-func (s StockUseCase) FindByStockCode(sc string) (entity.StockList, error) {
+func (s StockUseCase) FindByStockCode(sc string) (entity.StocksWithSplits, error) {
 	res, err := s.stockRepo.FindByStockCode(sc)
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
 	splits, err := s.stockRepo.FindStockSplitsByStockCode(sc)
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
-	return entity.StockList{
+	return entity.StocksWithSplits{
 		StockList:   res.Stocks(),
 		StockSplits: splits,
 	}, nil
 }
 
-func (s StockUseCase) FindByRandom() (entity.StockList, error) {
+func (s StockUseCase) FindByRandom() (entity.StocksWithSplits, error) {
 	sc, err := s.stockRepo.FindRandomSC()
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
 	res, err := s.stockRepo.FindByStockCode(sc)
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
 	splits, err := s.stockRepo.FindStockSplitsByStockCode(sc)
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
 	res.StockSplits = splits
@@ -170,5 +182,52 @@ func (s StockUseCase) SaveSearchCondition(create SearchConditionCreate, user ent
 			return ret
 		}(),
 	)
-	return s.stockRepo.SaveSearchCondition(SearchCondition)
+	return s.searchStockPatternRepo.SaveSearchCondition(SearchCondition)
+}
+
+func (s StockUseCase) SearchByCondition(req SearchReq) ([]string, error) {
+	condition, err := s.searchStockPatternRepo.FindByID(req.SearchPatternID)
+	if err != nil {
+		return nil, err
+	}
+
+	codes, err := s.stockRepo.ListSC()
+	if err != nil {
+		return nil, err
+	}
+
+	var retCodes []string
+
+	for _, c := range codes {
+		res, err := s.stockRepo.FindByStockCode(c)
+		if err != nil {
+			return nil, err
+		}
+
+		if condition.IsMatchPricePatterns(res.StockList.StocksCalc()) {
+			retCodes = append(retCodes, c)
+		}
+	}
+
+	searchedStockPatternID := s.ulid.New()
+	if err := s.searchedStockPatternRepository.Create(
+		entity.SearchedStockPattern{
+			SearchedStockPatternID: searchedStockPatternID,
+			SearchStockPatternID:   req.SearchPatternID,
+			SearchedStockPatternCodes: func() []*entity.SearchedStockPatternCode {
+				ret := make([]*entity.SearchedStockPatternCode, len(retCodes))
+				for i, c := range retCodes {
+					ret[i] = &entity.SearchedStockPatternCode{
+						SearchedStockPatternID: searchedStockPatternID,
+						StockCode:              c,
+					}
+				}
+				return ret
+			}(),
+			EndDate: req.EndDate,
+		}); err != nil {
+		return nil, err
+	}
+
+	return retCodes, nil
 }

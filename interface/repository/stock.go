@@ -22,7 +22,7 @@ func NewStockRepository(db *gorm.DB) port.StockRepository {
 	return &StockRepository{db: db}
 }
 
-func (r *StockRepository) Create(stocks entity.StockList) error {
+func (r *StockRepository) Create(stocks entity.StocksWithSplits) error {
 	return r.db.Transaction(func(tx *gorm.DB) error {
 		for _, stock := range stocks.Stocks() {
 			s := stock.Stock()
@@ -36,14 +36,14 @@ func (r *StockRepository) Create(stocks entity.StockList) error {
 	})
 }
 
-func (r *StockRepository) FindByStockCode(s string) (entity.StockList, error) {
+func (r *StockRepository) FindByStockCode(s string) (entity.StocksWithSplits, error) {
 	var stocks []*entity.Stock
 	err := r.db.Where("stock_code = ?", s).Find(&stocks).Error
 	if err != nil {
-		return entity.StockList{}, err
+		return entity.StocksWithSplits{}, err
 	}
 
-	return entity.StockList{
+	return entity.StocksWithSplits{
 		StockList: stocks,
 	}, nil
 }
@@ -59,7 +59,7 @@ func stringToFloatPointer(s string) *float64 {
 	return &f
 }
 
-func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StockList, error) {
+func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StocksWithSplits, error) {
 	var stocks []*entity.Stock
 	for {
 		record, err := reader.Read()
@@ -67,7 +67,7 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StockList, error) 
 			break
 		}
 		if err != nil {
-			return entity.StockList{}, err
+			return entity.StocksWithSplits{}, err
 		}
 
 		// 1行目をスルー
@@ -77,7 +77,7 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StockList, error) 
 
 		date, err := time.Parse("20060102", record[4])
 		if err != nil {
-			return entity.StockList{}, err
+			return entity.StocksWithSplits{}, err
 		}
 
 		stocks = append(stocks, &entity.Stock{
@@ -101,7 +101,7 @@ func (r *StockRepository) ReadCSV(reader *csv.Reader) (entity.StockList, error) 
 		})
 	}
 
-	return entity.StockList{
+	return entity.StocksWithSplits{
 		StockList: stocks,
 	}, nil
 }
@@ -142,8 +142,4 @@ func (r *StockRepository) FindStockSplitsByStockCode(s string) ([]entity.StockSp
 		return nil, err
 	}
 	return splits, nil
-}
-
-func (r *StockRepository) SaveSearchCondition(pattern entity.SearchStockPattern) error {
-	return r.db.Create(&pattern).Error
 }

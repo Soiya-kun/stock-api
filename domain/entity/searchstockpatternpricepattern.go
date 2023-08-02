@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"fmt"
 	"sort"
 )
 
@@ -71,10 +70,9 @@ func (s *SearchStockPattern) IsMatchPricePatterns(sc StocksCalc) bool {
 	})
 
 	// 価格パターンのrank算出
-	fmt.Println(len(s.PricePatterns), len(indexedPriceRanks))
 	passCount := 0
 	for i, pattern := range s.PricePatterns {
-		if pattern.IsMatchRank == false {
+		if !pattern.IsMatchRank {
 			passCount++
 			continue
 		}

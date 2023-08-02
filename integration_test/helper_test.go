@@ -170,7 +170,9 @@ func NewTestServer(
 	userUC := interactor.NewUserUseCase(email, ulidDriver, userAuth, userRepo)
 
 	stockRepo := repository.NewStockRepository(tx)
-	stockUC := interactor.NewStockUseCase(stockRepo)
+	searchStockPatternRepo := repository.NewSearchStockPatternRepository(tx)
+	searchedStockRepo := repository.NewSearchedStockPatternRepository(tx)
+	stockUC := interactor.NewStockUseCase(ulidDriver, stockRepo, searchStockPatternRepo, searchedStockRepo)
 
 	e := router.NewServer(
 		userUC,
