@@ -44,8 +44,8 @@ func main() {
 	stockUC := interactor.NewStockUseCase(ulidDriver, stockRepo, searchStockPatternRepo, searchedStockRepo)
 
 	ret, err := stockUC.SearchByCondition(interactor.SearchReq{
-		SearchPatternID: "",
-		EndDate:         time.Time{},
+		SearchPatternID: "01H735CS045WM440G2KZKSDFFM",
+		EndDate:         time.Date(2023, 8, 4, 0, 0, 0, 0, time.UTC),
 	})
 
 	if err != nil {

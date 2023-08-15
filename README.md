@@ -17,6 +17,13 @@ go >= 1.19
 windowsの場合は`docker-compose -f docker-compose.dev-windows.yml up -d`
 5. コンテナを立ち上げた状態で`make init-db`を実行し、初期データを作成する。
 
+## 株式データ投入
+
+```
+go run cmd/importonlocal/importonlocal.go
+
+go run cmd/searchbycondition/searchbycondition.go
+```
 ## テスト
 
 テストDBと接続しない場合のテストは

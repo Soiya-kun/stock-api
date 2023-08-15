@@ -5,22 +5,22 @@ import (
 )
 
 func (v *PricePatterns) RankIndex(idx int) int {
-	volumePatterns := *v
-	sort.Slice(volumePatterns, func(i, j int) bool {
-		return *volumePatterns[i].PricePoint > *volumePatterns[j].PricePoint
+	pricePatterns := *v
+	sort.Slice(pricePatterns, func(i, j int) bool {
+		return *pricePatterns[i].PricePoint < *pricePatterns[j].PricePoint
 	})
 
-	for i := range *v {
-		if volumePatterns[i].ArrIndex == idx {
+	for i := range pricePatterns {
+		if pricePatterns[i].ArrIndex == idx {
 			sameCount := 0
 			for j := i - 1; j > 0; j-- {
-				if *volumePatterns[i].PricePoint == *volumePatterns[j].PricePoint {
+				if *pricePatterns[i].PricePoint == *pricePatterns[j].PricePoint {
 					sameCount++
 					continue
 				}
 				break
 			}
-			return i - sameCount
+			return len(pricePatterns) - 1 - i + sameCount
 		}
 	}
 	return -1
@@ -47,26 +47,26 @@ func (s *SearchStockPattern) IsMatchPricePatterns(sc StocksCalc) bool {
 		return indexedPriceRanks[i].price > indexedPriceRanks[j].price
 	})
 	var maxPrice float64
-	for i, indexedPriceRank := range indexedPriceRanks {
+	for i := range indexedPriceRanks {
 		sameCount := 0
 		for j := i - 1; j > 0; j-- {
-			if indexedPriceRank.price == indexedPriceRanks[j].price {
+			if indexedPriceRanks[i].price == indexedPriceRanks[j].price {
 				sameCount++
 				continue
 			}
 			break
 		}
-		indexedPriceRank.rankIndex = i - sameCount
+		indexedPriceRanks[i].rankIndex = i - sameCount
 
-		if indexedPriceRank.price > maxPrice {
-			maxPrice = indexedPriceRank.price
+		if indexedPriceRanks[i].price > maxPrice {
+			maxPrice = indexedPriceRanks[i].price
 		}
 	}
-	for _, indexedPriceRank := range indexedPriceRanks {
-		indexedPriceRank.pricePoint = indexedPriceRank.price / maxPrice
+	for i := range indexedPriceRanks {
+		indexedPriceRanks[i].pricePoint = indexedPriceRanks[i].price / maxPrice
 	}
 	sort.Slice(indexedPriceRanks, func(i, j int) bool {
-		return indexedPriceRanks[i].index > indexedPriceRanks[j].index
+		return indexedPriceRanks[i].index < indexedPriceRanks[j].index
 	})
 
 	// 価格パターンのrank算出
