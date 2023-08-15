@@ -7,6 +7,9 @@ import (
 func (v *PricePatterns) RankIndex(idx int) int {
 	pricePatterns := *v
 	sort.Slice(pricePatterns, func(i, j int) bool {
+		if pricePatterns[i].PricePoint == nil || pricePatterns[j].PricePoint == nil {
+			return true
+		}
 		return *pricePatterns[i].PricePoint < *pricePatterns[j].PricePoint
 	})
 
@@ -14,6 +17,9 @@ func (v *PricePatterns) RankIndex(idx int) int {
 		if pricePatterns[i].ArrIndex == idx {
 			sameCount := 0
 			for j := i - 1; j > 0; j-- {
+				if pricePatterns[i].PricePoint == nil || pricePatterns[j].PricePoint == nil {
+					continue
+				}
 				if *pricePatterns[i].PricePoint == *pricePatterns[j].PricePoint {
 					sameCount++
 					continue
@@ -38,6 +44,9 @@ func (s *SearchStockPattern) IsMatchPricePatterns(sc StocksCalc) bool {
 	for i, s := range sc.getByIdxRange(
 		len(sc.Stocks)-len(s.PricePatterns)/4,
 		len(sc.Stocks)).Stocks {
+		if s == nil {
+			return false
+		}
 		indexedPriceRanks[i*4] = IndexedPriceRank{price: s.OpenedPriceVal(), index: i * 4}
 		indexedPriceRanks[i*4+1] = IndexedPriceRank{price: s.HighVal(), index: i*4 + 1}
 		indexedPriceRanks[i*4+2] = IndexedPriceRank{price: s.LowVal(), index: i*4 + 2}
@@ -70,16 +79,14 @@ func (s *SearchStockPattern) IsMatchPricePatterns(sc StocksCalc) bool {
 	})
 
 	// 価格パターンのrank算出
-	passCount := 0
 	for i, pattern := range s.PricePatterns {
 		if !pattern.IsMatchRank {
-			passCount++
 			continue
 		}
 		if indexedPriceRanks[i].rankIndex != s.PricePatterns.RankIndex(i) {
 			return false
 		}
-		if pattern.IsOver == nil {
+		if pattern.IsOver == nil || pattern.PricePoint == nil {
 			continue
 		}
 		if (*pattern.IsOver && indexedPriceRanks[i].pricePoint < *pattern.PricePoint) ||

@@ -1,9 +1,8 @@
 package entity_test
 
 import (
-	"testing"
-
 	"gitlab.com/soy-app/stock-api/domain/entity"
+	"testing"
 )
 
 func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
@@ -13,14 +12,14 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 	type args struct {
 		sc entity.StocksCalc
 	}
-	tests := []struct {
+	var tests = []struct {
 		name   string
 		fields fields
 		args   args
 		want   bool
 	}{
 		{
-			name: "正常系",
+			name: "正常系 rankが全て一致する",
 			fields: fields{
 				PricePatterns: entity.PricePatterns{
 					&entity.PricePattern{
@@ -83,7 +82,6 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 								Low:         func() *float64 { f := 100.00; return &f }(),
 								Price:       func() *float64 { f := 300.00; return &f }(),
 							},
-							Ma: nil,
 						},
 						{
 							Stock: entity.Stock{
@@ -99,84 +97,24 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 			want: true,
 		},
 		{
-			name: `
-			正常系
-			最終日のみ陽線で最高値
-			`,
+			name: "成功系 最終日だけrankが一致",
 			fields: fields{
 				PricePatterns: entity.PricePatterns{
-					&entity.PricePattern{
-						ArrIndex:    0,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
+					{ArrIndex: 0},
+					{ArrIndex: 1},
+					{ArrIndex: 2},
+					{ArrIndex: 3},
+					{ArrIndex: 4},
+					{
+						ArrIndex: 5,
+						PricePoint: func() *float64 {
+							f := 1.0
+							return &f
+						}(),
+						IsMatchRank: true,
 					},
-					&entity.PricePattern{
-						ArrIndex:    1,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    2,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    3,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    4,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    5,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    6,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    7,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    8,
-						PricePoint:  func() *float64 { f := 1.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    9,
-						PricePoint:  func() *float64 { f := 2.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    10,
-						PricePoint:  func() *float64 { f := 3.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    11,
-						PricePoint:  func() *float64 { f := 4.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
+					{ArrIndex: 6},
+					{ArrIndex: 7},
 				},
 			},
 			args: args{
@@ -184,111 +122,80 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 					Stocks: []*entity.StockCalc{
 						{
 							Stock: entity.Stock{
-								OpenedPrice: func() *float64 { f := 100.00; return &f }(),
-								High:        func() *float64 { f := 200.00; return &f }(),
-								Low:         func() *float64 { f := 350.00; return &f }(),
-								Price:       func() *float64 { f := 400.00; return &f }(),
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
+							},
+						},
+						{
+							Stock: entity.Stock{
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
+							},
+						},
+						{
+							Stock: entity.Stock{
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
 							},
 						},
 						{
 							Stock: entity.Stock{
 								OpenedPrice: func() *float64 { f := 1000.00; return &f }(),
-								High:        func() *float64 { f := 700.00; return &f }(),
-								Low:         func() *float64 { f := 700.00; return &f }(),
-								Price:       func() *float64 { f := 500.00; return &f }(),
-							},
-						},
-						{
-							Stock: entity.Stock{
-								OpenedPrice: func() *float64 { f := 1100.00; return &f }(),
-								High:        func() *float64 { f := 1200.00; return &f }(),
-								Low:         func() *float64 { f := 1050.00; return &f }(),
-								Price:       func() *float64 { f := 1150.00; return &f }(),
+								High:        func() *float64 { f := 1100.00; return &f }(),
+								Low:         func() *float64 { f := 500.00; return &f }(),
+								Price:       func() *float64 { f := 700.00; return &f }(),
 							},
 						},
 					},
 				},
 			},
-			want: true,
+			want: false,
 		},
 		{
-			name: `
-			異常系
-			最終日のみ陽線で最高値かどうか確認し、そうではない
-			`,
+			name: "成功系 最終日が陽線でrankが一致",
 			fields: fields{
 				PricePatterns: entity.PricePatterns{
-					&entity.PricePattern{
-						ArrIndex:    0,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
+					{ArrIndex: 0},
+					{ArrIndex: 1},
+					{ArrIndex: 2},
+					{ArrIndex: 3},
+					{
+						ArrIndex: 4,
+						PricePoint: func() *float64 {
+							f := 0.8
+							return &f
+						}(),
+						IsMatchRank: true,
 					},
-					&entity.PricePattern{
-						ArrIndex:    1,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
+					{
+						ArrIndex: 5,
+						PricePoint: func() *float64 {
+							f := 1.0
+							return &f
+						}(),
+						IsMatchRank: true,
 					},
-					&entity.PricePattern{
-						ArrIndex:    2,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
+					{
+						ArrIndex: 6,
+						PricePoint: func() *float64 {
+							f := 0.7
+							return &f
+						}(),
+						IsMatchRank: true,
 					},
-					&entity.PricePattern{
-						ArrIndex:    3,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    4,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    5,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    6,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    7,
-						PricePoint:  func() *float64 { f := 0.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    8,
-						PricePoint:  func() *float64 { f := 1.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    9,
-						PricePoint:  func() *float64 { f := 2.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    10,
-						PricePoint:  func() *float64 { f := 3.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
-					},
-					&entity.PricePattern{
-						ArrIndex:    11,
-						PricePoint:  func() *float64 { f := 4.0; return &f }(),
-						IsOver:      nil,
-						IsMatchRank: false,
+					{
+						ArrIndex: 7,
+						PricePoint: func() *float64 {
+							f := 0.9
+							return &f
+						}(),
+						IsMatchRank: true,
 					},
 				},
 			},
@@ -297,26 +204,34 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 					Stocks: []*entity.StockCalc{
 						{
 							Stock: entity.Stock{
-								OpenedPrice: func() *float64 { f := 100.00; return &f }(),
-								High:        func() *float64 { f := 200.00; return &f }(),
-								Low:         func() *float64 { f := 350.00; return &f }(),
-								Price:       func() *float64 { f := 400.00; return &f }(),
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
 							},
 						},
 						{
 							Stock: entity.Stock{
-								OpenedPrice: func() *float64 { f := 1000.00; return &f }(),
-								High:        func() *float64 { f := 700.00; return &f }(),
-								Low:         func() *float64 { f := 700.00; return &f }(),
-								Price:       func() *float64 { f := 500.00; return &f }(),
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
 							},
 						},
 						{
 							Stock: entity.Stock{
-								OpenedPrice: func() *float64 { f := 1100.00; return &f }(),
-								High:        func() *float64 { f := 1200.00; return &f }(),
-								Low:         func() *float64 { f := 700.00; return &f }(),
-								Price:       func() *float64 { f := 500.00; return &f }(),
+								OpenedPrice: func() *float64 { f := 200.00; return &f }(),
+								High:        func() *float64 { f := 400.00; return &f }(),
+								Low:         func() *float64 { f := 100.00; return &f }(),
+								Price:       func() *float64 { f := 300.00; return &f }(),
+							},
+						},
+						{
+							Stock: entity.Stock{
+								OpenedPrice: func() *float64 { f := 900.00; return &f }(),
+								High:        func() *float64 { f := 1100.00; return &f }(),
+								Low:         func() *float64 { f := 500.00; return &f }(),
+								Price:       func() *float64 { f := 1000.00; return &f }(),
 							},
 						},
 					},
@@ -327,7 +242,7 @@ func TestSearchStockPattern_IsMatchPricePatterns(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &entity.SearchStockPattern{
+			s := entity.SearchStockPattern{
 				PricePatterns: tt.fields.PricePatterns,
 			}
 			if got := s.IsMatchPricePatterns(tt.args.sc); got != tt.want {

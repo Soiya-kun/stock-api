@@ -20,11 +20,7 @@ func NewSearchedStockPatternRepository(db *gorm.DB) port.SearchedStockPatternRep
 }
 
 func (s SearchedStockPatternRepository) Create(searchedPattern entity.SearchedStockPattern) error {
-	return s.db.Create(&entity.SearchedStockPattern{
-		SearchedStockPatternID: searchedPattern.SearchedStockPatternID,
-		SearchStockPatternID:   searchedPattern.SearchStockPatternID,
-		EndDate:                searchedPattern.EndDate,
-	}).Error
+	return s.db.Create(&searchedPattern).Error
 }
 
 func (s SearchedStockPatternRepository) FindBySearchStockPatternIDAndEndDate(SearchStockPatternID string, endDate time.Time) (entity.SearchedStockPattern, error) {

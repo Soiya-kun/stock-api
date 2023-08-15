@@ -10,6 +10,30 @@ type StocksCalc struct {
 }
 
 func (s *StocksCalc) getByIdxRange(start, end int) StocksCalc {
+	// スライスの長さを取得
+	length := len(s.Stocks)
+
+	// start が範囲外の場合の調整
+	if start < 0 {
+		start = 0
+	}
+	if start > length {
+		start = length
+	}
+
+	// end が範囲外の場合の調整
+	if end < 0 {
+		end = 0
+	}
+	if end > length {
+		end = length
+	}
+
+	// start が end より大きい場合の調整
+	if start > end {
+		start, end = end, start
+	}
+
 	return StocksCalc{Stocks: s.Stocks[start:end]}
 }
 

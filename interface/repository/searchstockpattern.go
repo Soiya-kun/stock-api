@@ -23,7 +23,13 @@ func (s SearchStockPatternRepository) SaveSearchCondition(pattern entity.SearchS
 
 func (s SearchStockPatternRepository) FindByID(id string) (entity.SearchStockPattern, error) {
 	var pattern entity.SearchStockPattern
-	err := s.db.Where("search_stock_pattern_id = ?", id).First(&pattern).Error
+	err := s.db.
+		Preload("VolumePatterns").
+		Preload("PricePatterns").
+		Preload("MaXUpDownPatterns").
+		Where("search_stock_pattern_id = ?", id).
+		First(&pattern).
+		Error
 	if err != nil {
 		return entity.SearchStockPattern{}, err
 	}

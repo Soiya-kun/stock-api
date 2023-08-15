@@ -5,7 +5,6 @@ import (
 	"gitlab.com/soy-app/stock-api/domain/constructor"
 	"gitlab.com/soy-app/stock-api/domain/entity"
 	"gitlab.com/soy-app/stock-api/usecase/port"
-	"strconv"
 )
 
 type StockUseCase struct {
@@ -207,8 +206,8 @@ func (s StockUseCase) SearchByCondition(req SearchReq) ([]string, error) {
 		}
 
 		isMatched := condition.IsMatchPricePatterns(res.StockList.StocksCalc())
-		fmt.Printf("code %s isMatched: %s \n", c, strconv.FormatBool(isMatched))
 		if isMatched {
+			fmt.Println("matched")
 			retCodes = append(retCodes, c)
 		}
 	}
