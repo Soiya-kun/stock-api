@@ -109,6 +109,48 @@ func (h *StockHandler) ListSC(c echo.Context) error {
 	})
 }
 
+func (h *StockHandler) ListSCByThreshold(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	req := &schema.StockCodeByThresholdReq{}
+	if err := c.Bind(req); err != nil {
+		logger.Error("Failed to bind request", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	ret, err := h.StockUseCase.ListSCByThreshold(req.MinTradeValue, req.Date)
+	if err != nil {
+		logger.Error("Failed to delete stock", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, schema.StockCodeListRes{
+		StockCodes: ret,
+	})
+
+}
+
+func (h *StockHandler) ListSCSavedByUser(c echo.Context) error {
+	logger, _ := log.NewLogger()
+
+	ctx := c.Request().Context()
+	user, err := middleware.GetUserFromContext(ctx)
+	if err != nil {
+		logger.Error("Failed to get user from context", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	ret, err := h.StockUseCase.ListSCSavedByUser(user)
+	if err != nil {
+		logger.Error("Failed to delete stock", zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, schema.StockCodeListRes{
+		StockCodes: ret,
+	})
+}
+
 func (h *StockHandler) CreateSplit(c echo.Context) error {
 	logger, _ := log.NewLogger()
 

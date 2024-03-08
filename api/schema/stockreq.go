@@ -63,3 +63,8 @@ type SaveSearchConditionReq struct {
 		Pattern []bool `json:"pattern"`
 	} `json:"maXUpDownPatterns"`
 }
+
+type StockCodeByThresholdReq struct {
+	MinTradeValue int       `json:"minTradeValue"`
+	Date          time.Time `json:"date"`
+}

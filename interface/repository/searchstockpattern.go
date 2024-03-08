@@ -1,7 +1,9 @@
 package repository
 
 import (
+	"fmt"
 	"gorm.io/gorm"
+	"sort"
 
 	"gitlab.com/soy-app/stock-api/domain/entity"
 	"gitlab.com/soy-app/stock-api/usecase/port"
@@ -29,7 +31,14 @@ func (s SearchStockPatternRepository) FindByID(id string) (entity.SearchStockPat
 		Preload("MaXUpDownPatterns").
 		Where("search_stock_pattern_id = ?", id).
 		First(&pattern).
+		Order("arr_index desc").
 		Error
+	sort.Slice(pattern.PricePatterns, func(i, j int) bool {
+		return pattern.PricePatterns[i].ArrIndex < pattern.PricePatterns[j].ArrIndex
+	})
+	for i := range pattern.PricePatterns {
+		fmt.Println(pattern.PricePatterns[i].ArrIndex)
+	}
 	if err != nil {
 		return entity.SearchStockPattern{}, err
 	}

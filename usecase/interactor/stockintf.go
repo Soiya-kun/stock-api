@@ -79,6 +79,8 @@ type IStockUseCase interface {
 	FindByRandom() (entity.StocksWithSplits, error)
 	SaveStockCode(sc string, u entity.User) error
 	ListSC() ([]string, error)
+	ListSCByThreshold(threshold int, date time.Time) ([]string, error)
+	ListSCSavedByUser(u entity.User) ([]string, error)
 	CreateStockSplit(StockSplitCreate) error
 	SaveSearchCondition(SearchConditionCreate, entity.User) error
 	SearchByCondition(SearchReq) ([]string, error) // return stockCode

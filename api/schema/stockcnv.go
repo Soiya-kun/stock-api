@@ -51,7 +51,7 @@ func StockResFromEntity(s port.Stock) StockRes {
 }
 
 func StocksResFromEntity(s port.StockList) []StockRes {
-	ret := make([]StockRes, len(s.Stocks()))
+	ret := make([]StockRes, s.Len())
 	for i, v := range s.Stocks() {
 		ret[i] = StockResFromEntity(v)
 	}

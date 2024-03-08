@@ -17,3 +17,8 @@ func (s *StocksWithSplits) Stocks() Stocks {
 	}
 	return ret
 }
+
+// Len
+func (s *StocksWithSplits) Len() int {
+	return len(s.StockList)
+}

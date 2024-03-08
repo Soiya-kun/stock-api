@@ -131,6 +131,32 @@ func (r *StockRepository) ListSC() ([]string, error) {
 	return scs, nil
 }
 
+func (r *StockRepository) ListSCByThreshold(minTradingValue int, date time.Time) ([]string, error) {
+	var scs []string
+	err := r.db.Model(&entity.Stock{}).
+		Where("trading_value > ?", minTradingValue).
+		Where("DATE(date) = DATE(?)", date).
+		Group("stock_code").
+		Pluck("stock_code", &scs).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return scs, nil
+}
+
+func (r *StockRepository) ListSCSavedByUserID(userID string) ([]string, error) {
+	var scs []string
+	err := r.db.Model(&entity.SavedStockCode{}).
+		Where("user_id = ?", userID).
+		Pluck("stock_code", &scs).
+		Error
+	if err != nil {
+		return nil, err
+	}
+	return scs, nil
+}
+
 func (r *StockRepository) CreateStockSplit(s entity.StockSplit) error {
 	return r.db.Create(&s).Error
 }

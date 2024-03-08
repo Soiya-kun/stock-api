@@ -1,10 +1,10 @@
 package interactor
 
 import (
-	"fmt"
 	"gitlab.com/soy-app/stock-api/domain/constructor"
 	"gitlab.com/soy-app/stock-api/domain/entity"
 	"gitlab.com/soy-app/stock-api/usecase/port"
+	"time"
 )
 
 type StockUseCase struct {
@@ -72,7 +72,7 @@ func (s StockUseCase) FindByStockCode(sc string) (entity.StocksWithSplits, error
 	}
 
 	return entity.StocksWithSplits{
-		StockList:   res.Stocks(),
+		StockList:   res.StockList,
 		StockSplits: splits,
 	}, nil
 }
@@ -103,6 +103,14 @@ func (s StockUseCase) SaveStockCode(sc string, user entity.User) error {
 
 func (s StockUseCase) ListSC() ([]string, error) {
 	return s.stockRepo.ListSC()
+}
+
+func (s StockUseCase) ListSCByThreshold(i int, date time.Time) ([]string, error) {
+	return s.stockRepo.ListSCByThreshold(i, date)
+}
+
+func (s StockUseCase) ListSCSavedByUser(u entity.User) ([]string, error) {
+	return s.stockRepo.ListSCSavedByUserID(u.UserID)
 }
 
 func (s StockUseCase) CreateStockSplit(create StockSplitCreate) error {
@@ -207,7 +215,6 @@ func (s StockUseCase) SearchByCondition(req SearchReq) ([]string, error) {
 
 		isMatched := condition.IsMatchPricePatterns(res.StockList.StocksCalc())
 		if isMatched {
-			fmt.Println("matched")
 			retCodes = append(retCodes, c)
 		}
 	}

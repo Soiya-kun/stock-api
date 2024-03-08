@@ -73,6 +73,8 @@ func NewServer(
 	stockAuth.POST("/stock-splits", stockHandler.CreateSplit)
 	stockAuth.GET("/:sc", stockHandler.FindBySC)
 	stockAuth.POST("/stock-codes", stockHandler.SaveSC)
+	stockAuth.POST("/stock-codes/threshold", stockHandler.ListSCByThreshold)
+	stockAuth.GET("/my-stock-codes", stockHandler.ListSCSavedByUser)
 	stockAuth.POST("/save-search-stock-patterns", stockHandler.SaveSearchStockPattern)
 
 	// post code jp proxy
